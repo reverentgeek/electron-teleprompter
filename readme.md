@@ -2,6 +2,8 @@
 
 Desktop teleprompter app built with [Electron.js](https://www.electronjs.org/).
 
+This app is being built "in the open" on the [All Hands on Tech Live](https://www.twitch.tv/pluralsight_live) developer stream, available on Twitch, YouTube, LinkedIn, and Facebook.
+
 ## Setup
 
 1. Install [Node.js LTS](https://nodejs.org/) (v16+)
