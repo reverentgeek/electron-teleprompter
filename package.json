@@ -1,0 +1,20 @@
+{
+	"name": "electron-teleprompter",
+	"version": "1.0.0",
+	"description": "Desktop teleprompter application ",
+	"main": "src/main.js",
+	"scripts": {
+		"start": "electron ."
+	},
+	"author": "David Neal <david@reverentgeek.com>",
+	"license": "MIT",
+	"devDependencies": {
+		"electron": "^19.0.6",
+		"eslint": "^8.18.0",
+		"eslint-config-reverentgeek": "^3.2.1"
+	},
+	"dependencies": {
+		"fs-extra": "^10.1.0",
+		"showdown": "^2.1.0"
+	}
+}
