@@ -11,10 +11,10 @@ const saveState = async ( win ) => {
 
 const createWindow = () => {
 	const win = new BrowserWindow( {
-		width: 1146, // 800,
-		height: 643, // 600,
-		x: -1905,
-		y: 58,
+		width: 800,
+		height: 600,
+		// x: -1905,
+		// y: 58,
 		center: true,
 		webPreferences: {
 			preload: path.join( __dirname, "client", "teleprompter-preload.js" )
