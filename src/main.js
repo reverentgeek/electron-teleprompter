@@ -3,18 +3,29 @@
 const { app, BrowserWindow, ipcMain } = require( "electron" );
 const path = require( "path" );
 
+const defaultConfig = {
+	width: 800,
+	height: 600,
+	x: 0,
+	y: 0
+};
+const stateManager = require( "./utils/state" )( defaultConfig );
+
 const saveState = async ( win ) => {
 	const position = win.getPosition();
 	const size = win.getSize();
 	console.log( "position: ", position, "size: ", size );
 };
 
-const createWindow = () => {
+const createWindow = ( state ) => {
+
+	// position:  [ -1879, 44 ] size:  [ 1162, 849 ]
+
 	const win = new BrowserWindow( {
-		width: 800,
-		height: 600,
-		// x: -1905,
-		// y: 58,
+		width: state.width,
+		height: state.height,
+		x: state.x,
+		y: state.y,
 		center: true,
 		webPreferences: {
 			preload: path.join( __dirname, "client", "teleprompter-preload.js" )
@@ -30,8 +41,9 @@ const createWindow = () => {
 	} );
 };
 
-app.whenReady().then( () => {
-	createWindow();
+app.whenReady().then( async () => {
+	const state = await stateManager.readAppState();
+	createWindow( state );
 
 	ipcMain.on( "error-messages", ( event, args ) => {
 		console.log( event, args );
