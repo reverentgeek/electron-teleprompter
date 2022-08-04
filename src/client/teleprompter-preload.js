@@ -6,7 +6,6 @@ const showdown = require( "showdown" );
 async function getContent() {
 	const fileName = path.join( __dirname, "content.md" );
 	const content = await fs.readFile( fileName, { encoding: "utf-8" } );
-	console.log( content );
 	return content;
 }
 
