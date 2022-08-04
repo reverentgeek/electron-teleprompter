@@ -12,7 +12,6 @@ module.exports = ( defaultConfig ) => {
 		const exists = await fs.pathExists( appStateFile );
 		if ( exists ) {
 			const config = await fs.readJSON( appStateFile );
-			console.log( config );
 			return config;
 		}
 		console.log( "state file does not exist!" );

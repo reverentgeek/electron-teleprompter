@@ -14,12 +14,16 @@ const stateManager = require( "./utils/state" )( defaultConfig );
 const saveState = async ( win ) => {
 	const position = win.getPosition();
 	const size = win.getSize();
-	console.log( "position: ", position, "size: ", size );
+
+	stateManager.writeAppState( {
+		width: size[0],
+		height: size[1],
+		x: position[0],
+		y: position[1]
+	} );
 };
 
 const createWindow = ( state ) => {
-
-	// position:  [ -1879, 44 ] size:  [ 1162, 849 ]
 
 	const win = new BrowserWindow( {
 		width: state.width,
