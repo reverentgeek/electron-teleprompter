@@ -1,6 +1,6 @@
 # Teleprompter Script version 1
 
-## Talking Point 1
+## Hello Stream Viewers
 
 * Idea 1
 * Idea 2
