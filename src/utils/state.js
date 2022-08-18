@@ -11,8 +11,14 @@ module.exports = ( defaultConfig ) => {
 	async function readAppState() {
 		const exists = await fs.pathExists( appStateFile );
 		if ( exists ) {
-			const config = await fs.readJSON( appStateFile );
-			return config;
+			try {
+				const config = await fs.readJSON( appStateFile );
+				return config;
+			} catch ( err ) {
+				console.log( "Error reading state file." );
+				console.log( err );
+				return defaultConfig;
+			}
 		}
 		console.log( "state file does not exist!" );
 		return defaultConfig;
