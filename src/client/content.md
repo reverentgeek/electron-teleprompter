@@ -1,6 +1,6 @@
 # Teleprompter Script version 1
 
-## Hello Stream Viewers
+## Hey Y'all
 
 * Idea 1
 * Idea 2

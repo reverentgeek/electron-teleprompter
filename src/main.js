@@ -3,6 +3,8 @@
 const { app, BrowserWindow, ipcMain } = require( "electron" );
 const path = require( "path" );
 
+const menus = require( "./menus" );
+
 const defaultConfig = {
 	width: 800,
 	height: 600,
@@ -44,9 +46,12 @@ const createWindow = ( state ) => {
 	win.on( "close", async () => {
 		await saveState( win );
 	} );
+
+	menus.buildMenus( win );
 };
 
 app.whenReady().then( async () => {
+
 	const state = await stateManager.readAppState();
 	createWindow( state );
 
