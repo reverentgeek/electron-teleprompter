@@ -1,6 +1,6 @@
 "use strict";
 
-const { app, Menu, dialog, ipcMain } = require( "electron" );
+const { Menu, dialog } = require( "electron" );
 const content = require( "./utils/content" );
 
 function buildMenus( browserWindow ) {
@@ -27,9 +27,7 @@ function buildMenus( browserWindow ) {
 						const md = await content.readAndConvertMarkdown( scriptFile );
 						if ( md ) {
 							// send md to browserWindow
-							// console.log( md );
 							browserWindow.webContents.send( "content", md );
-							// console.log( "browserWindow", browserWindow );
 						} else {
 							// display error message loading file
 							console.log( "There was an error converting markdown" );

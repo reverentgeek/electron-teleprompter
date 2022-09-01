@@ -1,5 +1,3 @@
-// console.log( "this is from teleprompter.js" );
-
 let scriptIndex = 0;
 
 function jumpToSection( index ) {
@@ -10,20 +8,18 @@ function jumpToSection( index ) {
 }
 
 document.addEventListener( "keydown", ( event ) => {
-	// console.log( event );
-
 	if ( event.key === "ArrowRight" ) {
+		// Advance to next section
 		const sections = document.getElementsByName( scriptIndex + 1 );
 		if ( sections.length > 0 ) {
 			scriptIndex++;
 			jumpToSection( scriptIndex );
 		}
-		// Advance to next section
 	} else if ( event.key === "ArrowLeft" ) {
+		// Go back to previous section
 		if ( scriptIndex > 0 ) {
 			scriptIndex--;
 			jumpToSection( scriptIndex );
 		}
-		// Go back to previous section
 	}
 } );
