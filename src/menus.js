@@ -1,28 +1,46 @@
 "use strict";
 
-const { app, Menu, dialog } = require( "electron" );
+const { app, Menu, dialog, ipcMain } = require( "electron" );
+const content = require( "./utils/content" );
 
 function buildMenus( browserWindow ) {
 
+	const isMac = process.platform === "darwin";
+
 	const template = [
-		{ role: "appMenu" },
+		...( isMac ? [ { role: "appMenu" } ] : [] ),
 		{ 	label: "File", submenu: [
 			{
 				label: "Open",
 				accelerator: "Cmd+O",
 				click: async () => {
 					const results = await dialog.showOpenDialog( browserWindow, {
-						properties: [ "openFile" ]
+						properties: [ "openFile" ],
+						filters: [
+							{ name: "Markdown", extensions: [ "md", "txt" ] },
+							{ name: "All Files", extensions: [ "*" ] }
+						]
 					} );
 					if ( !results.canceled ) {
 						const scriptFile = results.filePaths[0];
 						console.log( "The file: ", scriptFile );
+						const md = await content.readAndConvertMarkdown( scriptFile );
+						if ( md ) {
+							// send md to browserWindow
+							// console.log( md );
+							browserWindow.webContents.send( "content", md );
+							// console.log( "browserWindow", browserWindow );
+						} else {
+							// display error message loading file
+							console.log( "There was an error converting markdown" );
+						}
 					} else {
 						console.log( "User cancelled!" );
 					}
 				} },
 			{ role: "quit" }
-		] }
+		] },
+		{ role: "viewMenu" }
 	];
 
 	// const isMac = process.platform === "darwin";
