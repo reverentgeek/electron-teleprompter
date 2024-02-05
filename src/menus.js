@@ -1,9 +1,9 @@
 "use strict";
 
-const { Menu, dialog } = require( "electron" );
+const { Menu, dialog, ipcMain } = require( "electron" );
 const content = require( "./utils/content" );
 
-function buildMenus( browserWindow ) {
+function buildMenus( browserWindow, watchFile ) {
 
 	const isMac = process.platform === "darwin";
 
@@ -23,11 +23,12 @@ function buildMenus( browserWindow ) {
 					} );
 					if ( !results.canceled ) {
 						const scriptFile = results.filePaths[0];
-						console.log( "The file: ", scriptFile );
+						// console.log( "The file: ", scriptFile );
 						const md = await content.readAndConvertMarkdown( scriptFile );
 						if ( md ) {
 							// send md to browserWindow
 							browserWindow.webContents.send( "content", md );
+							watchFile( scriptFile );
 						} else {
 							// display error message loading file
 							console.log( "There was an error converting markdown" );

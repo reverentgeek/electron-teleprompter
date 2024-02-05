@@ -2,7 +2,9 @@
 
 const { app, BrowserWindow, ipcMain } = require( "electron" );
 const path = require( "path" );
+const chokidar = require( "chokidar" );
 
+const content = require( "./utils/content" );
 const menus = require( "./menus" );
 
 const defaultConfig = {
@@ -12,6 +14,7 @@ const defaultConfig = {
 	y: 0
 };
 const stateManager = require( "./utils/state" )( defaultConfig );
+let watcher;
 
 const saveState = async ( win ) => {
 	const position = win.getPosition();
@@ -47,7 +50,19 @@ const createWindow = ( state ) => {
 		await saveState( win );
 	} );
 
-	menus.buildMenus( win );
+	async function watchFile( scriptFile ) {
+		if ( watcher ) {
+			await watcher.close();
+		}
+		watcher = chokidar.watch( scriptFile );
+		watcher.on( "change", async () => {
+			const md = await content.readAndConvertMarkdown( scriptFile );
+			win.webContents.send( "content", md );
+		} );
+	}
+
+	menus.buildMenus( win, watchFile );
+
 };
 
 app.whenReady().then( async () => {
@@ -58,4 +73,5 @@ app.whenReady().then( async () => {
 	ipcMain.on( "error-messages", ( event, args ) => {
 		console.log( event, args );
 	} );
+
 } );
