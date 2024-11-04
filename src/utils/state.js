@@ -1,12 +1,10 @@
-"use strict";
+import { app } from "electron";
+import { join } from "node:path";
+import fs from "fs-extra";
 
-const { app } = require( "electron" );
-const path = require( "path" );
-const fs = require( "fs-extra" );
-
-module.exports = ( defaultConfig ) => {
+export default ( defaultConfig ) => {
 	const userFolder = app.getPath( "userData" );
-	const appStateFile = path.join( userFolder, "app-state.json" );
+	const appStateFile = join( userFolder, "app-state.json" );
 
 	async function readAppState() {
 		const exists = await fs.pathExists( appStateFile );

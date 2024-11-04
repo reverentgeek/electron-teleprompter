@@ -1,7 +1,5 @@
-"use strict";
-
-const fs = require( "fs-extra" );
-const showdown = require( "showdown" );
+import fs from "fs-extra";
+import showdown from "showdown";
 
 async function convertMDtoHTML( md ) {
 	const converter = new showdown.Converter();
@@ -18,22 +16,20 @@ function injectHeadingAnchors( html ) {
 	return html;
 }
 
-async function readAndConvertMarkdown( filePath ) {
+export async function readAndConvertMarkdown( filePath ) {
 	try {
 		// read the markdown
 		const md = await fs.readFile( filePath, { encoding: "utf-8" } );
+		// console.log( md );
 		// convert the md to html
 		const html = await convertMDtoHTML( md );
+		// console.log( html );
 		// inject anchors for keyboard/clicker support
 		const updatedHtml = injectHeadingAnchors( html );
-
+		// console.log( updatedHtml );
 		return updatedHtml;
 	} catch ( err ) {
 		console.log( err );
 		return null;
 	}
 }
-
-module.exports = {
-	readAndConvertMarkdown
-};

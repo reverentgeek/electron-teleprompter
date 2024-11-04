@@ -1,13 +1,23 @@
-"use strict";
+import rg from "eslint-config-reverentgeek";
+import globals from "globals";
 
-const rgConfig = require( "eslint-config-reverentgeek" );
-module.exports = [
-	...rgConfig.configs.node,
+export default [
+	...rg.configs[ "node-esm" ],
 	{
 		rules: {
-			"n/no-unpublished-require": [ "error", {
+			"n/no-unpublished-import": [ "error", {
 				allowModules: [ "eslint-config-reverentgeek", "electron" ]
+			} ],
+			"n/no-extraneous-import": [ "error", {
+				allowModules: [ "globals" ]
 			} ]
+		}
+	}, {
+		files: [ "src/client/**/*.js", "src/client/**/*.mjs" ],
+		languageOptions: {
+			ecmaVersion: "latest",
+			sourceType: "module",
+			globals: globals.browser
 		}
 	}
 ];

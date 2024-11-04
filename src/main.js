@@ -1,11 +1,11 @@
-"use strict";
+import { app, BrowserWindow, ipcMain } from "electron";
+import path from "node:path";
+import chokidar from "chokidar";
+import stateFactory from "./utils/state.js";
+import { readAndConvertMarkdown } from "./utils/content.js";
+import { buildMenus } from "./menus.js";
 
-const { app, BrowserWindow, ipcMain } = require( "electron" );
-const path = require( "path" );
-const chokidar = require( "chokidar" );
-
-const content = require( "./utils/content" );
-const menus = require( "./menus" );
+const __dirname = import.meta.dirname;
 
 const defaultConfig = {
 	width: 800,
@@ -13,7 +13,8 @@ const defaultConfig = {
 	x: 0,
 	y: 0
 };
-const stateManager = require( "./utils/state" )( defaultConfig );
+
+const stateManager = stateFactory( defaultConfig );
 let watcher;
 
 const saveState = async ( win ) => {
@@ -38,7 +39,7 @@ const createWindow = ( state ) => {
 		center: true,
 		webPreferences: {
 			nodeIntegration: true,
-			preload: path.join( __dirname, "client", "teleprompter-preload.js" )
+			preload: path.join( __dirname, "client", "teleprompter-preload.mjs" )
 		},
 		transparent: true,
 		frame: false
@@ -56,12 +57,12 @@ const createWindow = ( state ) => {
 		}
 		watcher = chokidar.watch( scriptFile );
 		watcher.on( "change", async () => {
-			const md = await content.readAndConvertMarkdown( scriptFile );
+			const md = await readAndConvertMarkdown( scriptFile );
 			win.webContents.send( "content", md );
 		} );
 	}
 
-	menus.buildMenus( win, watchFile );
+	buildMenus( win, watchFile );
 
 };
 

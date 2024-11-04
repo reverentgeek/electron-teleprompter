@@ -4,6 +4,7 @@
 	"version": "1.0.2",
 	"description": "Desktop teleprompter application ",
 	"main": "src/main.js",
+	"type": "module",
 	"scripts": {
 		"start": "electron --trace-deprecation .",
 		"build": "electron-packager ./ --out ./dist"
