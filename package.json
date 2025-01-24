@@ -6,7 +6,7 @@
 	"main": "src/main.js",
 	"type": "module",
 	"scripts": {
-		"start": "electron --trace-deprecation .",
+		"start": "electron .",
 		"build": "electron-packager ./ --out ./dist"
 	},
 	"author": "David Neal <david@reverentgeek.com>",

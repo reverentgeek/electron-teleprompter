@@ -1,8 +1,8 @@
 import { ipcRenderer } from "electron";
 
-window.addEventListener( "DOMContentLoaded", async () => {
+self.addEventListener( "DOMContentLoaded", () => {
 	try {
-		ipcRenderer.on( "content", ( event, content ) => {
+		ipcRenderer.on( "content", ( _event, content ) => {
 			console.log( "received content..." );
 			const el = document.getElementById( "md" );
 			if ( el ) {
