@@ -1,7 +1,7 @@
 {
 	"name": "electron-teleprompter",
 	"productName": "Electron Teleprompter",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "Desktop teleprompter application ",
 	"main": "src/main.js",
 	"type": "module",
@@ -12,7 +12,7 @@
 	"author": "David Neal <david@reverentgeek.com>",
 	"license": "MIT",
 	"devDependencies": {
-		"electron": "^34.0.2",
+		"electron": "^36.4.0",
 		"electron-packager": "^17.1.1",
 		"eslint": "^9.14.0",
 		"eslint-config-reverentgeek": "^5.1.0"
