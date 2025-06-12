@@ -11,6 +11,9 @@
 	},
 	"author": "David Neal <david@reverentgeek.com>",
 	"license": "MIT",
+	"engines": {
+		"node": ">=22.0.0"
+	},
 	"devDependencies": {
 		"electron": "^36.4.0",
 		"electron-packager": "^17.1.1",
