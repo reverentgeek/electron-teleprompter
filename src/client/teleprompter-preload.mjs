@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 
 self.addEventListener( "DOMContentLoaded", () => {
 	try {
@@ -7,9 +7,14 @@ self.addEventListener( "DOMContentLoaded", () => {
 			const el = document.getElementById( "md" );
 			if ( el ) {
 				el.innerHTML = content;
+				ipcRenderer.send( "refresh" );
 			}
 		} );
 	} catch ( err ) {
 		ipcRenderer.send( "error-messages", err );
 	}
+} );
+
+contextBridge.exposeInMainWorld( "electron", {
+	refresh: () => ipcRenderer.send( "refresh" )
 } );

@@ -64,15 +64,30 @@ const createWindow = ( state ) => {
 
 	buildMenus( win, watchFile );
 
+	return win;
 };
+
+function forceRepaint( window ) {
+	const size = window.getSize();
+	setTimeout( () => {
+		console.log( "size:", size );
+		window.setSize( size[0]+1, size[1]+1, false );
+		window.setSize( size[0], size[1], false );
+	}, 50 );
+}
 
 app.whenReady().then( async () => {
 
 	const state = await stateManager.readAppState();
-	createWindow( state );
+	const window = createWindow( state );
 
 	ipcMain.on( "error-messages", ( event, args ) => {
 		console.log( event, args );
+	} );
+
+	ipcMain.on( "refresh", () => {
+		console.log( "client requested refresh..." );
+		forceRepaint( window );
 	} );
 
 } );

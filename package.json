@@ -15,7 +15,7 @@
 		"node": ">=22.0.0"
 	},
 	"devDependencies": {
-		"electron": "^36.4.0",
+		"electron": "^37.1.0",
 		"electron-packager": "^17.1.1",
 		"eslint": "^9.14.0",
 		"eslint-config-reverentgeek": "^5.1.0"
