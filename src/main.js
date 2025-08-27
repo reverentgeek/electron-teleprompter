@@ -30,7 +30,6 @@ const saveState = async ( win ) => {
 };
 
 const createWindow = ( state ) => {
-
 	const win = new BrowserWindow( {
 		width: state.width,
 		height: state.height,
@@ -71,13 +70,12 @@ function forceRepaint( window ) {
 	const size = window.getSize();
 	setTimeout( () => {
 		console.log( "size:", size );
-		window.setSize( size[0]+1, size[1]+1, false );
+		window.setSize( size[0] + 1, size[1] + 1, false );
 		window.setSize( size[0], size[1], false );
 	}, 50 );
 }
 
 app.whenReady().then( async () => {
-
 	const state = await stateManager.readAppState();
 	const window = createWindow( state );
 
@@ -89,5 +87,4 @@ app.whenReady().then( async () => {
 		console.log( "client requested refresh..." );
 		forceRepaint( window );
 	} );
-
 } );

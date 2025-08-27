@@ -2,12 +2,11 @@ import { Menu, dialog } from "electron";
 import { readAndConvertMarkdown } from "./utils/content.js";
 
 export function buildMenus( browserWindow, watchFile ) {
-
 	const isMac = process.platform === "darwin";
 
 	const template = [
 		...( isMac ? [ { role: "appMenu" } ] : [] ),
-		{ 	label: "File", submenu: [
+		{ label: "File", submenu: [
 			{
 				label: "Open",
 				accelerator: "Cmd+O",

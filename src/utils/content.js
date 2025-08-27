@@ -9,7 +9,7 @@ async function convertMDtoHTML( md ) {
 function injectHeadingAnchors( html ) {
 	const regex = /<h2 [^>]*>/gm;
 	const matches = html.match( regex );
-	for( let i = 0; i < matches.length; i++ ) {
+	for ( let i = 0; i < matches.length; i++ ) {
 		html = html.replace( matches[i], `${ matches[i] }<a name="${ i }"></a>` );
 	}
 	html += "<p>&nbsp;</p>".repeat( 10 );

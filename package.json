@@ -1,7 +1,7 @@
 {
 	"name": "electron-teleprompter",
 	"productName": "Electron Teleprompter",
-	"version": "2.2.1",
+	"version": "2.2.2",
 	"description": "Desktop teleprompter application ",
 	"main": "src/main.js",
 	"type": "module",
@@ -18,7 +18,7 @@
 		"electron": "^37.1.0",
 		"electron-packager": "^17.1.1",
 		"eslint": "^9.14.0",
-		"eslint-config-reverentgeek": "^5.1.0"
+		"eslint-config-reverentgeek": "^6.0.2"
 	},
 	"dependencies": {
 		"chokidar": "^4.0.1",
