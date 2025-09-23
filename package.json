@@ -7,7 +7,7 @@
 	"type": "module",
 	"scripts": {
 		"start": "electron .",
-		"build": "electron-packager ./ --out ./dist"
+		"build": "npx @electron/packager ./ --out ./dist"
 	},
 	"author": "David Neal <david@reverentgeek.com>",
 	"license": "MIT",
@@ -15,8 +15,8 @@
 		"node": ">=22.0.0"
 	},
 	"devDependencies": {
-		"electron": "^37.1.0",
-		"electron-packager": "^17.1.1",
+		"@electron/packager": "^18.4.4",
+		"electron": "^38.1.2",
 		"eslint": "^9.14.0",
 		"eslint-config-reverentgeek": "^6.0.2"
 	},
