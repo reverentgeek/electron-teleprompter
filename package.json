@@ -1,28 +1,29 @@
 {
 	"name": "electron-teleprompter",
 	"productName": "Electron Teleprompter",
-	"version": "2.2.2",
+	"version": "2.2.3",
 	"description": "Desktop teleprompter application ",
 	"main": "src/main.js",
 	"type": "module",
 	"scripts": {
 		"start": "electron .",
-		"build": "npx @electron/packager ./ --out ./dist"
+		"build": "npx @electron/packager ./ --out ./dist",
+		"lint": "eslint --fix"
 	},
 	"author": "David Neal <david@reverentgeek.com>",
 	"license": "MIT",
 	"engines": {
-		"node": ">=22.0.0"
+		"node": ">=22.16.0"
 	},
 	"devDependencies": {
 		"@electron/packager": "^18.4.4",
-		"electron": "^38.1.2",
-		"eslint": "^9.14.0",
-		"eslint-config-reverentgeek": "^6.0.2"
+		"electron": "^38.2.0",
+		"eslint": "^9.36.0",
+		"eslint-config-reverentgeek": "^6.3.0"
 	},
 	"dependencies": {
-		"chokidar": "^4.0.1",
-		"fs-extra": "^11.1.1",
+		"chokidar": "^4.0.3",
+		"fs-extra": "^11.3.2",
 		"showdown": "^2.1.0"
 	}
 }
