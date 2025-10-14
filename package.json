@@ -17,8 +17,8 @@
 	},
 	"devDependencies": {
 		"@electron/packager": "^18.4.4",
-		"electron": "^38.2.0",
-		"eslint": "^9.36.0",
+		"electron": "^38.2.2",
+		"eslint": "^9.37.0",
 		"eslint-config-reverentgeek": "^6.3.0"
 	},
 	"dependencies": {
