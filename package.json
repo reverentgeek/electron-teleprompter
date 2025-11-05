@@ -17,9 +17,9 @@
 	},
 	"devDependencies": {
 		"@electron/packager": "^19.0.1",
-		"electron": "^39.0.0",
-		"eslint": "^9.39.0",
-		"eslint-config-reverentgeek": "^6.3.1"
+		"electron": "^39.1.0",
+		"eslint": "^9.39.1",
+		"eslint-config-reverentgeek": "^6.3.2"
 	},
 	"dependencies": {
 		"chokidar": "^4.0.3",
