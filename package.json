@@ -22,7 +22,7 @@
 		"eslint-config-reverentgeek": "^6.3.6"
 	},
 	"dependencies": {
-		"chokidar": "^4.0.3",
+		"chokidar": "^5.0.0",
 		"fs-extra": "^11.3.3",
 		"showdown": "^2.1.0"
 	},
