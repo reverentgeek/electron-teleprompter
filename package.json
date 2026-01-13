@@ -1,7 +1,7 @@
 {
 	"name": "electron-teleprompter",
 	"productName": "Electron Teleprompter",
-	"version": "2.2.11",
+	"version": "2.2.12",
 	"description": "Desktop teleprompter application ",
 	"main": "src/main.js",
 	"type": "module",
