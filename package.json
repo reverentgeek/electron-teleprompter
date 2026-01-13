@@ -19,7 +19,7 @@
 		"@electron/packager": "^19.0.1",
 		"electron": "^39.2.7",
 		"eslint": "^9.39.2",
-		"eslint-config-reverentgeek": "^6.3.7"
+		"eslint-config-reverentgeek": "^6.3.8"
 	},
 	"dependencies": {
 		"chokidar": "^5.0.0",
