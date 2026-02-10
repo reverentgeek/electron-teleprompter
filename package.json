@@ -7,7 +7,7 @@
 	"type": "module",
 	"scripts": {
 		"start": "electron .",
-		"build": "npx @electron/packager ./ --out ./dist",
+		"build": "npx @electron/packager --overwrite ./ --out ./dist --ignore=\"/node_modules/\\.ignored\" --ignore=\"/node_modules/(electron|@electron|eslint)\"",
 		"lint": "eslint --fix"
 	},
 	"author": "David Neal <david@reverentgeek.com>",
@@ -16,7 +16,7 @@
 		"node": ">=22.16.0"
 	},
 	"devDependencies": {
-		"@electron/packager": "^19.0.2",
+		"@electron/packager": "^19.0.3",
 		"electron": "^40.2.1",
 		"eslint": "^10.0.0",
 		"eslint-config-reverentgeek": "^7.0.0"
@@ -26,5 +26,5 @@
 		"fs-extra": "^11.3.3",
 		"showdown": "^2.1.0"
 	},
-	"packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264"
+	"packageManager": "pnpm@10.29.2+sha512.bef43fa759d91fd2da4b319a5a0d13ef7a45bb985a3d7342058470f9d2051a3ba8674e629672654686ef9443ad13a82da2beb9eeb3e0221c87b8154fff9d74b8"
 }

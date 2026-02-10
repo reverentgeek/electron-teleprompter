@@ -19,8 +19,8 @@ importers:
         version: 2.1.0
     devDependencies:
       '@electron/packager':
-        specifier: ^19.0.2
-        version: 19.0.2
+        specifier: ^19.0.3
+        version: 19.0.3
       electron:
         specifier: ^40.2.1
         version: 40.2.1
@@ -55,8 +55,8 @@ packages:
     engines: {node: '>=22.12.0'}
     hasBin: true
 
-  '@electron/packager@19.0.2':
-    resolution: {integrity: sha512-fKBH0VvAuK9ait4TwDrMZLuZuTTXUzhn4G2O/QrND7JpWnQt8Ei2BKXu1PqOdCKR+CdYy4WuD2/gi+zgfSsKng==}
+  '@electron/packager@19.0.3':
+    resolution: {integrity: sha512-0pVvEvvABVxpViKettjpGeK8hp08CtRy2B+vyNVDXYB630SJTZF4oSa7hW5Vhq6j7JA1vJSyyPYTBG/GAqWBzQ==}
     engines: {node: '>= 22.12.0'}
     hasBin: true
 
@@ -154,8 +154,8 @@ packages:
     resolution: {integrity: sha512-P1Cz1dWaFfR4IR+U13mqqiGsLFf1KbayybWwdd2vfctdV6hDpUkgCY0nKOLLTMSoRd/jJNjtbqzf13K8DCCXQw==}
     engines: {node: '>=18'}
 
-  '@stylistic/eslint-plugin@5.7.1':
-    resolution: {integrity: sha512-zjTUwIsEfT+k9BmXwq1QEFYsb4afBlsI1AXFyWQBgggMzwBFOuu92pGrE5OFx90IOjNl+lUbQoTG7f8S0PkOdg==}
+  '@stylistic/eslint-plugin@5.8.0':
+    resolution: {integrity: sha512-WNPVF/FfBAjyi3OA7gok8swRiImNLKI4dmV3iK/GC/0xSJR7eCzBFsw9hLZVgb1+MYNLy7aDsjohxN1hA/FIfQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: '>=9.0.0'
@@ -182,11 +182,11 @@ packages:
   '@types/keyv@3.1.4':
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
 
-  '@types/node@24.10.11':
-    resolution: {integrity: sha512-/Af7O8r1frCVgOz0I62jWUtMohJ0/ZQU/ZoketltOJPZpnb17yoNc9BSoVuV9qlaIXJiPNOpsfq4ByFajSArNQ==}
+  '@types/node@24.10.12':
+    resolution: {integrity: sha512-68e+T28EbdmLSTkPgs3+UacC6rzmqrcWFPQs1C8mwJhI/r5Uxr0yEuQotczNRROd1gq30NGxee+fo0rSIxpyAw==}
 
-  '@types/node@25.2.1':
-    resolution: {integrity: sha512-CPrnr8voK8vC6eEtyRzvMpgp3VyVRhgclonE7qYi6P9sXwYb59ucfrnmFBTaP0yUi8Gk4yZg/LlTJULGxvTNsg==}
+  '@types/node@25.2.2':
+    resolution: {integrity: sha512-BkmoP5/FhRYek5izySdkOneRyXYN35I860MFAGupTdebyE66uZaR+bXLHq8k4DirE5DwQi3NuhvRU1jqTVwUrQ==}
 
   '@types/responselike@1.0.3':
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
@@ -194,8 +194,8 @@ packages:
   '@types/yauzl@2.10.3':
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
 
-  '@typescript-eslint/types@8.54.0':
-    resolution: {integrity: sha512-PDUI9R1BVjqu7AUDsRBbKMtwmjWcn4J3le+5LpcFgWULN3LvHC5rkc9gCVxbrsrGmO1jfPybN5s6h4Jy+OnkAA==}
+  '@typescript-eslint/types@8.55.0':
+    resolution: {integrity: sha512-ujT0Je8GI5BJWi+/mMoR0wxwVEQaxM+pi30xuMiJETlX80OPovb2p9E8ss87gnSVtYXtJoU9U1Cowcr6w2FE0w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@xmldom/xmldom@0.8.11':
@@ -1091,7 +1091,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@electron/packager@19.0.2':
+  '@electron/packager@19.0.3':
     dependencies:
       '@electron/asar': 4.0.1
       '@electron/get': 4.0.2
@@ -1200,10 +1200,10 @@ snapshots:
 
   '@sindresorhus/is@7.2.0': {}
 
-  '@stylistic/eslint-plugin@5.7.1(eslint@10.0.0)':
+  '@stylistic/eslint-plugin@5.8.0(eslint@10.0.0)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@10.0.0)
-      '@typescript-eslint/types': 8.54.0
+      '@typescript-eslint/types': 8.55.0
       eslint: 10.0.0
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
@@ -1218,7 +1218,7 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.2.0
       '@types/keyv': 3.1.4
-      '@types/node': 24.10.11
+      '@types/node': 24.10.12
       '@types/responselike': 1.0.3
 
   '@types/esrecurse@4.3.1': {}
@@ -1231,27 +1231,27 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 24.10.11
+      '@types/node': 24.10.12
 
-  '@types/node@24.10.11':
+  '@types/node@24.10.12':
     dependencies:
       undici-types: 7.16.0
 
-  '@types/node@25.2.1':
+  '@types/node@25.2.2':
     dependencies:
       undici-types: 7.16.0
     optional: true
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 24.10.11
+      '@types/node': 24.10.12
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 25.2.1
+      '@types/node': 25.2.2
     optional: true
 
-  '@typescript-eslint/types@8.54.0': {}
+  '@typescript-eslint/types@8.55.0': {}
 
   '@xmldom/xmldom@0.8.11': {}
 
@@ -1381,7 +1381,7 @@ snapshots:
   electron@40.2.1:
     dependencies:
       '@electron/get': 2.0.3
-      '@types/node': 24.10.11
+      '@types/node': 24.10.12
       extract-zip: 2.0.1
     transitivePeerDependencies:
       - supports-color
@@ -1424,7 +1424,7 @@ snapshots:
   eslint-config-reverentgeek@7.0.0(eslint@10.0.0)(typescript@5.9.2):
     dependencies:
       '@eslint/js': 10.0.1(eslint@10.0.0)
-      '@stylistic/eslint-plugin': 5.7.1(eslint@10.0.0)
+      '@stylistic/eslint-plugin': 5.8.0(eslint@10.0.0)
       eslint: 10.0.0
       eslint-plugin-n: 17.23.2(eslint@10.0.0)(typescript@5.9.2)
       globals: 17.3.0
