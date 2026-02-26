@@ -18,29 +18,34 @@ Electron Teleprompter is a desktop app that displays markdown/HTML as a transluc
 
 ```
 Main Process (src/main.js)
-    ├── IPC messages: "content", "refresh", "error-messages"
-    ├── menus.js — app menu with File > Open for loading scripts
+    ├── IPC: "content", "fontSize", "opacity", "mirrored"
+    ├── menus.js — File > Open, File > Open Recent
     └── utils/
-        ├── state.js — persists window geometry to app-state.json
+        ├── state.js — persists app state to app-state.json
         └── content.js — markdown→HTML via showdown, injects H2 anchor navigation
             │
-            │  IPC "content" sends HTML
+            │  IPC sends HTML + settings to renderer
             ▼
 Preload (src/client/teleprompter-preload.mjs)
-    - Receives "content" IPC, injects into #md element
-    - Exposes window.electron.refresh() to renderer
+    - Pure IPC bridge via contextBridge
+    - Exposes: onContent, onFontSize/saveFontSize, onOpacity/saveOpacity, onMirrored/saveMirrored
             │
             ▼
-Renderer (src/client/teleprompter.js + teleprompter.html + teleprompter.css)
-    - Keyboard/clicker navigation: arrow keys jump between H2 sections
-    - Scroll-based refresh (debounced) for transparent window repainting
+Renderer (src/client/teleprompter.js [module] + teleprompter.html + teleprompter.css)
+    - Keyboard/clicker navigation: left/right arrows jump between H2 sections
+    - Font size, opacity, and mirror mode controls
+    - All DOM manipulation happens here (not in preload)
 ```
 
-**Data flow for opening a file:** Menu open dialog → `readAndConvertMarkdown()` (reads file, converts via showdown, injects `<a name="N">` anchors before H2s, appends scroll padding) → sends HTML over IPC → preload injects into DOM → renderer triggers `forceRepaint()`.
+**Data flow for opening a file:** Menu or recent file click → `openScriptFile()` → `readAndConvertMarkdown()` (reads file, converts via showdown, injects `<a name="N">` anchors before H2s, appends scroll padding) → sends HTML over IPC → renderer updates `#md` innerHTML.
 
 **File watching:** Main process uses `chokidar` to watch the opened script file and auto-reloads on external changes.
 
-**Window:** Frameless, transparent, always-on-top. Position/size persisted via `state.js` to `~/Library/Application Support/Electron Teleprompter/app-state.json`.
+**State persistence:** `app-state.json` at `~/Library/Application Support/Electron Teleprompter/` stores window geometry, fontSize, opacity, mirrored, and recentFiles. On first launch (no state file), the window centers on screen.
+
+**Startup:** Auto-loads the most recent file from `recentFiles` and restores fontSize, opacity, and mirrored settings via `did-finish-load` IPC messages.
+
+**Preload considerations:** The preload is an ESM file (`.mjs`). `sandbox: false` is required in webPreferences for ESM preloads to work. `nodeIntegration: false` is set for security. The renderer script uses `type="module"` to guarantee it runs after the preload's `contextBridge` setup.
 
 ## Code Style
 
@@ -48,3 +53,4 @@ Renderer (src/client/teleprompter.js + teleprompter.html + teleprompter.css)
 - Tab indentation
 - ESLint config splits: `node-esm` rules for main process, `browser` rules for `src/client/`
 - Requires Node.js >= 22.16.0
+- Use `??` (nullish coalescing) instead of `||` for settings where `0` or `false` are valid values (e.g., opacity)
