@@ -2,11 +2,32 @@
 
 Desktop teleprompter app built with [Electron.js](https://www.electronjs.org/).
 
+## Features
+
+- Translucent overlay — see through the script to your presentation or video call
+- Built-in markdown editor with syntax highlighting
+- Live reload — script automatically reloads when the file is modified externally
+- Adjustable background opacity
+- Font size is persisted across sessions
+- Mirror/flip mode — for physical teleprompter setups with beam splitters
+- Recently opened files — File > Open Recent submenu
+- Auto-loads last opened file on startup
+- Window position and size are persisted across sessions
+
 ## Usage
 
 The Electron Teleprompter app can load any markdown and/or HTML syntax and display that as a translucent overlay on the screen. In this way you can load a script and still see your presentation, video conferencing, or any other applications through the script.
 
 Use the File -> Open menu (or keyboard shortcut) to open a text file that contains markdown or HTML as a script.
+
+### What is Markdown?
+
+Markdown is a lightweight syntax for creating formatted documents. For example, headings use the <code>#</code> symbol.
+
+```md
+# This is a Main Heading
+## This is a Secondary Heading
+```
 
 ### Use H2 tags for navigation
 
@@ -20,13 +41,10 @@ You can freely toggle between the editor and the teleprompter preview with `Cmd/
 
 ### Keyboard Shortcuts
 
+#### Shortcuts for the managing the teleprompter overlay
+
 | Shortcut              | Action                        |
 | --------------------- | ----------------------------- |
-| `Cmd/Ctrl+N`          | New file                      |
-| `Cmd/Ctrl+O`          | Open a markdown/text file     |
-| `Cmd/Ctrl+E`          | Toggle editor / preview       |
-| `Cmd/Ctrl+S`          | Save (in editor mode)         |
-| `Cmd/Ctrl+Shift+S`    | Save As (in editor mode)      |
 | `Right Arrow`         | Jump to next section (H2)     |
 | `Left Arrow`          | Jump to previous section (H2) |
 | `Up/Down Arrow`       | Scroll up/down                |
@@ -38,26 +56,15 @@ You can freely toggle between the editor and the teleprompter preview with `Cmd/
 | `Cmd/Ctrl+Shift+Down` | Decrease background opacity   |
 | `Cmd/Ctrl+Shift+0`    | Reset opacity to default      |
 
-### Features
+#### Shortcuts for managing the editor
 
-- Translucent overlay — see through the script to your presentation or video call
-- Built-in markdown editor with syntax highlighting
-- Live reload — script automatically reloads when the file is modified externally
-- Adjustable background opacity
-- Font size is persisted across sessions
-- Mirror/flip mode — for physical teleprompter setups with beam splitters
-- Recently opened files — File > Open Recent submenu
-- Auto-loads last opened file on startup
-- Window position and size are persisted across sessions
-
-### What is Markdown?
-
-Markdown is a lightweight syntax for creating formatted documents. For example, headings use the <code>#</code> symbol.
-
-```md
-# This is a Main Heading
-## This is a Secondary Heading
-```
+| Shortcut              | Action                        |
+| --------------------- | ----------------------------- |
+| `Cmd/Ctrl+N`          | New file                      |
+| `Cmd/Ctrl+O`          | Open a markdown/text file     |
+| `Cmd/Ctrl+E`          | Toggle editor / preview       |
+| `Cmd/Ctrl+S`          | Save (in editor mode)         |
+| `Cmd/Ctrl+Shift+S`    | Save As (in editor mode)      |
 
 ## Developer Setup
 
