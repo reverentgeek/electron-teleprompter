@@ -31,6 +31,5 @@ window.electron.onContent( ( content ) => {
 	if ( md ) {
 		md.innerHTML = content;
 		scriptIndex = 0;
-		window.electron.refresh();
 	}
 } );
