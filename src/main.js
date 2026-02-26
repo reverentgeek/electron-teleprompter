@@ -7,18 +7,26 @@ import { buildMenus } from "./menus.js";
 
 const __dirname = import.meta.dirname;
 
+const MAX_RECENT_FILES = 10;
+
 const defaultConfig = {
 	width: 800,
 	height: 600,
 	x: 0,
 	y: 0,
-	fontSize: 3
+	fontSize: 3,
+	recentFiles: []
 };
 
 const stateManager = stateFactory( defaultConfig );
 let watcher;
 
 let currentFontSize = defaultConfig.fontSize;
+let recentFiles = [];
+
+function addRecentFile( filePath ) {
+	recentFiles = [ filePath, ...recentFiles.filter( f => f !== filePath ) ].slice( 0, MAX_RECENT_FILES );
+}
 
 const saveState = async ( win ) => {
 	const position = win.getPosition();
@@ -29,7 +37,8 @@ const saveState = async ( win ) => {
 		height: size[1],
 		x: position[0],
 		y: position[1],
-		fontSize: currentFontSize
+		fontSize: currentFontSize,
+		recentFiles
 	} );
 };
 
@@ -59,7 +68,7 @@ const createWindow = ( state ) => {
 		await saveState( win );
 	} );
 
-	async function watchFile( scriptFile ) {
+	async function watchScriptFile( scriptFile ) {
 		if ( watcher ) {
 			await watcher.close();
 		}
@@ -70,18 +79,37 @@ const createWindow = ( state ) => {
 		} );
 	}
 
-	buildMenus( win, watchFile );
+	async function openScriptFile( scriptFile ) {
+		const md = await readAndConvertMarkdown( scriptFile );
+		if ( md ) {
+			win.webContents.send( "content", md );
+			addRecentFile( scriptFile );
+			watchScriptFile( scriptFile );
+			buildMenus( win, openScriptFile, recentFiles );
+		}
+		return md;
+	}
 
-	return win;
+	buildMenus( win, openScriptFile, recentFiles );
+
+	return { win, openScriptFile };
 };
 
 app.whenReady().then( async () => {
 	const state = await stateManager.readAppState();
 	currentFontSize = state.fontSize || defaultConfig.fontSize;
+	recentFiles = state.recentFiles || [];
 
 	ipcMain.on( "fontSize", ( _event, size ) => {
 		currentFontSize = size;
 	} );
 
-	createWindow( state );
+	const { win, openScriptFile } = createWindow( state );
+
+	// Auto-load most recent file on startup
+	if ( recentFiles.length > 0 ) {
+		win.webContents.on( "did-finish-load", () => {
+			openScriptFile( recentFiles[0] );
+		} );
+	}
 } );

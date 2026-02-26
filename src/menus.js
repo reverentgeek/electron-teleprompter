@@ -1,8 +1,24 @@
 import { Menu, dialog } from "electron";
-import { readAndConvertMarkdown } from "./utils/content.js";
+import path from "node:path";
 
-export function buildMenus( browserWindow, watchFile ) {
+export function buildMenus( browserWindow, openScriptFile, recentFiles ) {
 	const isMac = process.platform === "darwin";
+
+	const recentSubmenu = recentFiles.map( filePath => ( {
+		label: path.basename( filePath ),
+		click: () => openScriptFile( filePath )
+	} ) );
+
+	if ( recentSubmenu.length > 0 ) {
+		recentSubmenu.push( { type: "separator" } );
+		recentSubmenu.push( {
+			label: "Clear Recent",
+			click: () => {
+				recentFiles.length = 0;
+				buildMenus( browserWindow, openScriptFile, recentFiles );
+			}
+		} );
+	}
 
 	const template = [
 		...( isMac ? [ { role: "appMenu" } ] : [] ),
@@ -19,22 +35,16 @@ export function buildMenus( browserWindow, watchFile ) {
 						]
 					} );
 					if ( !results.canceled ) {
-						const scriptFile = results.filePaths[0];
-						console.log( "The file: ", scriptFile );
-						const md = await readAndConvertMarkdown( scriptFile );
-						if ( md ) {
-							// send md to browserWindow
-							console.log( "Sending content to browserWindow..." );
-							browserWindow.webContents.send( "content", md );
-							watchFile( scriptFile );
-						} else {
-							// display error message loading file
-							console.log( "There was an error converting markdown" );
-						}
-					} else {
-						console.log( "User cancelled!" );
+						openScriptFile( results.filePaths[0] );
 					}
 				} },
+			{
+				label: "Open Recent",
+				submenu: recentSubmenu.length > 0
+					? recentSubmenu
+					: [ { label: "No Recent Files", enabled: false } ]
+			},
+			{ type: "separator" },
 			{ role: "quit" }
 		] },
 		{ role: "viewMenu" }
