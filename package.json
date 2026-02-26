@@ -12,6 +12,10 @@
 	},
 	"author": "David Neal <david@reverentgeek.com>",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/reverentgeek/electron-teleprompter.git"
+	},
 	"engines": {
 		"node": ">=22.16.0"
 	},
