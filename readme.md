@@ -12,11 +12,21 @@ Use the File -> Open menu (or keyboard shortcut) to open a text file that contai
 
 Use H2 tags (`##` in markdown) to create both headings and navigation points in your script. Pressing the right arrow on your keyboard will jump the script to the next heading, left arrow to go back. You can also use a presentation remote/clicker (e.g. [Logitech presentation remotes](https://www.logitech.com/en-us/products/presenters.html)) to go navigate forward/back.
 
+### Built-in Markdown Editor
+
+Press `Cmd/Ctrl+E` to open the built-in editor, or `Cmd/Ctrl+N` to start a new script. The editor uses a dark theme with syntax highlighting for markdown, and the background becomes opaque so you can focus on writing.
+
+You can freely toggle between the editor and the teleprompter preview with `Cmd/Ctrl+E` to see how your script looks — your changes are preserved as you switch back and forth. Save with `Cmd/Ctrl+S` or use `Cmd/Ctrl+Shift+S` to save as a new file. If you close the app or open a different file with unsaved changes, you'll be prompted to save first.
+
 ### Keyboard Shortcuts
 
 | Shortcut              | Action                        |
 | --------------------- | ----------------------------- |
+| `Cmd/Ctrl+N`          | New file                      |
 | `Cmd/Ctrl+O`          | Open a markdown/text file     |
+| `Cmd/Ctrl+E`          | Toggle editor / preview       |
+| `Cmd/Ctrl+S`          | Save (in editor mode)         |
+| `Cmd/Ctrl+Shift+S`    | Save As (in editor mode)      |
 | `Right Arrow`         | Jump to next section (H2)     |
 | `Left Arrow`          | Jump to previous section (H2) |
 | `Up/Down Arrow`       | Scroll up/down                |
@@ -31,6 +41,7 @@ Use H2 tags (`##` in markdown) to create both headings and navigation points in 
 ### Features
 
 - Translucent overlay — see through the script to your presentation or video call
+- Built-in markdown editor with syntax highlighting
 - Live reload — script automatically reloads when the file is modified externally
 - Adjustable background opacity
 - Font size is persisted across sessions
