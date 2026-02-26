@@ -95,6 +95,32 @@ document.addEventListener( "keydown", ( event ) => {
 	}
 } );
 
+// Resize handle
+const resizeHandle = document.getElementById( "resize-handle" );
+if ( resizeHandle ) {
+	resizeHandle.addEventListener( "mousedown", ( e ) => {
+		e.preventDefault();
+		const startX = e.screenX;
+		const startY = e.screenY;
+		const startWidth = window.outerWidth;
+		const startHeight = window.outerHeight;
+
+		function onMouseMove( moveEvent ) {
+			const newWidth = Math.max( 200, startWidth + moveEvent.screenX - startX );
+			const newHeight = Math.max( 150, startHeight + moveEvent.screenY - startY );
+			window.electron.resizeWindow( newWidth, newHeight );
+		}
+
+		function onMouseUp() {
+			document.removeEventListener( "mousemove", onMouseMove );
+			document.removeEventListener( "mouseup", onMouseUp );
+		}
+
+		document.addEventListener( "mousemove", onMouseMove );
+		document.addEventListener( "mouseup", onMouseUp );
+	} );
+}
+
 // Handle content loaded from main process
 window.electron.onContent( ( content ) => {
 	if ( md ) {

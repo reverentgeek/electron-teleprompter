@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld( "electron", {
 	onMirrored: callback => ipcRenderer.on( "mirrored", ( _event, value ) => callback( value ) ),
 	saveMirrored: value => ipcRenderer.send( "mirrored", value ),
 	onOpacity: callback => ipcRenderer.on( "opacity", ( _event, value ) => callback( value ) ),
-	saveOpacity: value => ipcRenderer.send( "opacity", value )
+	saveOpacity: value => ipcRenderer.send( "opacity", value ),
+	resizeWindow: ( width, height ) => ipcRenderer.send( "resizeWindow", width, height )
 } );

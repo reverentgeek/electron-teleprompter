@@ -121,6 +121,10 @@ app.whenReady().then( async () => {
 
 	const { win, openScriptFile } = createWindow( state );
 
+	ipcMain.on( "resizeWindow", ( _event, width, height ) => {
+		win.setSize( width, height, false );
+	} );
+
 	// Auto-load most recent file on startup
 	if ( recentFiles.length > 0 ) {
 		win.webContents.on( "did-finish-load", () => {
