@@ -14,21 +14,25 @@ Use H2 tags (`##` in markdown) to create both headings and navigation points in 
 
 ### Keyboard Shortcuts
 
-| Shortcut         | Action                        |
-| ---------------- | ----------------------------- |
-| `Cmd/Ctrl+O`     | Open a markdown/text file     |
-| `Right Arrow`    | Jump to next section (H2)     |
-| `Left Arrow`     | Jump to previous section (H2) |
-| `Up/Down Arrow`  | Scroll up/down                |
-| `Cmd/Ctrl+Plus`  | Increase font size            |
-| `Cmd/Ctrl+Minus` | Decrease font size            |
-| `Cmd/Ctrl+0`     | Reset font size to default    |
-| `Cmd/Ctrl+M`     | Toggle mirror/flip mode       |
+| Shortcut              | Action                        |
+| --------------------- | ----------------------------- |
+| `Cmd/Ctrl+O`          | Open a markdown/text file     |
+| `Right Arrow`         | Jump to next section (H2)     |
+| `Left Arrow`          | Jump to previous section (H2) |
+| `Up/Down Arrow`       | Scroll up/down                |
+| `Cmd/Ctrl+Plus`       | Increase font size            |
+| `Cmd/Ctrl+Minus`      | Decrease font size            |
+| `Cmd/Ctrl+0`          | Reset font size to default    |
+| `Cmd/Ctrl+M`          | Toggle mirror/flip mode       |
+| `Cmd/Ctrl+Shift+Up`   | Increase background opacity   |
+| `Cmd/Ctrl+Shift+Down` | Decrease background opacity   |
+| `Cmd/Ctrl+Shift+0`    | Reset opacity to default      |
 
 ### Features
 
 - Translucent overlay — see through the script to your presentation or video call
 - Live reload — script automatically reloads when the file is modified externally
+- Adjustable background opacity
 - Font size is persisted across sessions
 - Mirror/flip mode — for physical teleprompter setups with beam splitters
 - Recently opened files — File > Open Recent submenu

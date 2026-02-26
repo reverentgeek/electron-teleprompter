@@ -15,6 +15,7 @@ const defaultConfig = {
 	x: 0,
 	y: 0,
 	fontSize: 3,
+	opacity: 0.07,
 	mirrored: false,
 	recentFiles: []
 };
@@ -23,6 +24,7 @@ const stateManager = stateFactory( defaultConfig );
 let watcher;
 
 let currentFontSize = defaultConfig.fontSize;
+let currentOpacity = defaultConfig.opacity;
 let currentMirrored = defaultConfig.mirrored;
 let recentFiles = [];
 
@@ -40,6 +42,7 @@ const saveState = async ( win ) => {
 		x: position[0],
 		y: position[1],
 		fontSize: currentFontSize,
+		opacity: currentOpacity,
 		mirrored: currentMirrored,
 		recentFiles
 	} );
@@ -65,6 +68,7 @@ const createWindow = ( state ) => {
 
 	win.webContents.on( "did-finish-load", () => {
 		win.webContents.send( "fontSize", state.fontSize || defaultConfig.fontSize );
+		win.webContents.send( "opacity", state.opacity ?? defaultConfig.opacity );
 		win.webContents.send( "mirrored", state.mirrored || false );
 	} );
 
@@ -102,11 +106,16 @@ const createWindow = ( state ) => {
 app.whenReady().then( async () => {
 	const state = await stateManager.readAppState();
 	currentFontSize = state.fontSize || defaultConfig.fontSize;
+	currentOpacity = state.opacity ?? defaultConfig.opacity;
 	currentMirrored = state.mirrored || false;
 	recentFiles = state.recentFiles || [];
 
 	ipcMain.on( "fontSize", ( _event, size ) => {
 		currentFontSize = size;
+	} );
+
+	ipcMain.on( "opacity", ( _event, value ) => {
+		currentOpacity = value;
 	} );
 
 	ipcMain.on( "mirrored", ( _event, value ) => {

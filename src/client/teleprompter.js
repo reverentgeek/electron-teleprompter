@@ -19,6 +19,22 @@ window.electron.onFontSize( ( size ) => {
 	setFontSize( size, false );
 } );
 
+const DEFAULT_OPACITY = 0.07;
+const OPACITY_STEP = 0.05;
+let opacity = DEFAULT_OPACITY;
+
+function setOpacity( value, save = true ) {
+	opacity = Math.min( 1, Math.max( 0, Math.round( value * 100 ) / 100 ) );
+	document.body.style.backgroundColor = `rgba(0, 0, 0, ${ opacity })`;
+	if ( save ) {
+		window.electron.saveOpacity( opacity );
+	}
+}
+
+window.electron.onOpacity( ( value ) => {
+	setOpacity( value, false );
+} );
+
 let mirrored = false;
 
 function setMirrored( value, save = true ) {
@@ -55,18 +71,27 @@ document.addEventListener( "keydown", ( event ) => {
 			scriptIndex--;
 			jumpToSection( scriptIndex );
 		}
-	} else if ( ( event.metaKey || event.ctrlKey ) && ( event.key === "=" || event.key === "+" ) ) {
+	} else if ( ( event.metaKey || event.ctrlKey ) && !event.shiftKey && ( event.key === "=" || event.key === "+" ) ) {
 		event.preventDefault();
 		setFontSize( fontSize + FONT_SIZE_STEP );
-	} else if ( ( event.metaKey || event.ctrlKey ) && event.key === "-" ) {
+	} else if ( ( event.metaKey || event.ctrlKey ) && !event.shiftKey && event.key === "-" ) {
 		event.preventDefault();
 		setFontSize( fontSize - FONT_SIZE_STEP );
-	} else if ( ( event.metaKey || event.ctrlKey ) && event.key === "0" ) {
+	} else if ( ( event.metaKey || event.ctrlKey ) && !event.shiftKey && event.key === "0" ) {
 		event.preventDefault();
 		setFontSize( DEFAULT_FONT_SIZE );
 	} else if ( ( event.metaKey || event.ctrlKey ) && event.key === "m" ) {
 		event.preventDefault();
 		setMirrored( !mirrored );
+	} else if ( ( event.metaKey || event.ctrlKey ) && event.shiftKey && event.key === "ArrowUp" ) {
+		event.preventDefault();
+		setOpacity( opacity + OPACITY_STEP );
+	} else if ( ( event.metaKey || event.ctrlKey ) && event.shiftKey && event.key === "ArrowDown" ) {
+		event.preventDefault();
+		setOpacity( opacity - OPACITY_STEP );
+	} else if ( ( event.metaKey || event.ctrlKey ) && event.shiftKey && ( event.key === ")" || event.key === "0" ) ) {
+		event.preventDefault();
+		setOpacity( DEFAULT_OPACITY );
 	}
 } );
 
