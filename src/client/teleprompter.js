@@ -1,6 +1,24 @@
 let scriptIndex = 0;
 const md = document.getElementById( "md" );
 
+const DEFAULT_FONT_SIZE = 3;
+const FONT_SIZE_STEP = 0.25;
+const MIN_FONT_SIZE = 1;
+const MAX_FONT_SIZE = 8;
+let fontSize = DEFAULT_FONT_SIZE;
+
+function setFontSize( size, save = true ) {
+	fontSize = Math.min( MAX_FONT_SIZE, Math.max( MIN_FONT_SIZE, size ) );
+	document.body.style.fontSize = `${ fontSize }em`;
+	if ( save ) {
+		window.electron.saveFontSize( fontSize );
+	}
+}
+
+window.electron.onFontSize( ( size ) => {
+	setFontSize( size, false );
+} );
+
 function jumpToSection( index ) {
 	const url = location.href;
 	location.href = "#" + index;
@@ -23,6 +41,15 @@ document.addEventListener( "keydown", ( event ) => {
 			scriptIndex--;
 			jumpToSection( scriptIndex );
 		}
+	} else if ( ( event.metaKey || event.ctrlKey ) && ( event.key === "=" || event.key === "+" ) ) {
+		event.preventDefault();
+		setFontSize( fontSize + FONT_SIZE_STEP );
+	} else if ( ( event.metaKey || event.ctrlKey ) && event.key === "-" ) {
+		event.preventDefault();
+		setFontSize( fontSize - FONT_SIZE_STEP );
+	} else if ( ( event.metaKey || event.ctrlKey ) && event.key === "0" ) {
+		event.preventDefault();
+		setFontSize( DEFAULT_FONT_SIZE );
 	}
 } );
 

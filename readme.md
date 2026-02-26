@@ -12,6 +12,25 @@ Use the File -> Open menu (or keyboard shortcut) to open a text file that contai
 
 Use H2 tags (`##` in markdown) to create both headings and navigation points in your script. Pressing the right arrow on your keyboard will jump the script to the next heading, left arrow to go back. You can also use a presentation remote/clicker (e.g. [Logitech presentation remotes](https://www.logitech.com/en-us/products/presenters.html)) to go navigate forward/back.
 
+### Keyboard Shortcuts
+
+| Shortcut         | Action                        |
+| ---------------- | ----------------------------- |
+| `Cmd/Ctrl+O`     | Open a markdown/text file     |
+| `Right Arrow`    | Jump to next section (H2)     |
+| `Left Arrow`     | Jump to previous section (H2) |
+| `Up/Down Arrow`  | Scroll up/down                |
+| `Cmd/Ctrl+Plus`  | Increase font size            |
+| `Cmd/Ctrl+Minus` | Decrease font size            |
+| `Cmd/Ctrl+0`     | Reset font size to default    |
+
+### Features
+
+- Translucent overlay — see through the script to your presentation or video call
+- Live reload — script automatically reloads when the file is modified externally
+- Font size is persisted across sessions
+- Window position and size are persisted across sessions
+
 ### What is Markdown?
 
 Markdown is a lightweight syntax for creating formatted documents. For example, headings use the <code>#</code> symbol.
