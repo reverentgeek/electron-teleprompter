@@ -1,4 +1,4 @@
-import fs from "fs-extra";
+import fs from "node:fs/promises";
 import showdown from "showdown";
 
 async function convertMDtoHTML( md ) {
