@@ -24,6 +24,13 @@ export function buildMenus( browserWindow, openScriptFile, recentFiles ) {
 		...( isMac ? [ { role: "appMenu" } ] : [] ),
 		{ label: "File", submenu: [
 			{
+				label: "New",
+				accelerator: "CmdOrCtrl+N",
+				click: () => {
+					browserWindow.webContents.send( "newFile" );
+				}
+			},
+			{
 				label: "Open",
 				accelerator: "CmdOrCtrl+O",
 				click: async () => {
@@ -45,7 +52,39 @@ export function buildMenus( browserWindow, openScriptFile, recentFiles ) {
 					: [ { label: "No Recent Files", enabled: false } ]
 			},
 			{ type: "separator" },
+			{
+				label: "Save",
+				accelerator: "CmdOrCtrl+S",
+				click: () => {
+					browserWindow.webContents.send( "menuSave" );
+				}
+			},
+			{
+				label: "Save As...",
+				accelerator: "CmdOrCtrl+Shift+S",
+				click: () => {
+					browserWindow.webContents.send( "menuSaveAs" );
+				}
+			},
+			{ type: "separator" },
 			{ role: "quit" }
+		] },
+		{ label: "Edit", submenu: [
+			{
+				label: "Toggle Editor",
+				accelerator: "CmdOrCtrl+E",
+				click: () => {
+					browserWindow.webContents.send( "toggleEditor" );
+				}
+			},
+			{ type: "separator" },
+			{ role: "undo" },
+			{ role: "redo" },
+			{ type: "separator" },
+			{ role: "cut" },
+			{ role: "copy" },
+			{ role: "paste" },
+			{ role: "selectAll" }
 		] },
 		{ role: "viewMenu" }
 	];

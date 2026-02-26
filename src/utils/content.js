@@ -20,6 +20,20 @@ function injectHeadingAnchors( html ) {
 	return html;
 }
 
+export async function convertMarkdown( md ) {
+	const html = await convertMDtoHTML( md );
+	return injectHeadingAnchors( html );
+}
+
+export async function readRawMarkdown( filePath ) {
+	try {
+		return await fs.readFile( filePath, { encoding: "utf-8" } );
+	} catch ( err ) {
+		console.log( err );
+		return null;
+	}
+}
+
 export async function readAndConvertMarkdown( filePath ) {
 	try {
 		// read the markdown

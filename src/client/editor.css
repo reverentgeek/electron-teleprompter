@@ -1,0 +1,70 @@
+#editor-container {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	overflow: hidden;
+	background-color: #282c34;
+	-webkit-app-region: no-drag;
+}
+
+#editor-toolbar {
+	display: flex;
+	align-items: center;
+	padding: 6px 12px;
+	background-color: #21252b;
+	border-bottom: 1px solid #181a1f;
+	-webkit-app-region: drag;
+	flex-shrink: 0;
+}
+
+#editor-toolbar .toolbar-filename {
+	flex: 1;
+	color: #9da5b4;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#editor-toolbar .toolbar-dirty {
+	color: #e5c07b;
+	margin-left: 4px;
+}
+
+#editor-toolbar button {
+	-webkit-app-region: no-drag;
+	background: #3a3f4b;
+	color: #abb2bf;
+	border: 1px solid #4b5263;
+	border-radius: 4px;
+	padding: 4px 12px;
+	margin-left: 8px;
+	font-size: 12px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+	cursor: pointer;
+}
+
+#editor-toolbar button:hover {
+	background: #4b5263;
+	color: #d7dae0;
+}
+
+#editor-toolbar button.primary {
+	background: #528bff;
+	color: #fff;
+	border-color: #528bff;
+}
+
+#editor-toolbar button.primary:hover {
+	background: #6da0ff;
+}
+
+#editor {
+	flex: 1;
+	overflow: hidden;
+}
+
+.hidden {
+	display: none !important;
+}

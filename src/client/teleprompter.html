@@ -4,14 +4,15 @@
 <head>
 	<meta charset="UTF-8">
 	<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-	<meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+	<meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
 	<title>Electron Teleprompter</title>
 	<link rel="stylesheet" type="text/css" href="teleprompter.css">
+	<link rel="stylesheet" type="text/css" href="editor.css">
 </head>
 
 <body>
-	<div class="content">
+	<div id="preview-container" class="content">
 		<div id="md">
 			<h1><a name="0"></a>Electron Teleprompter</h1>
 			<p>The Electron Teleprompter app can load any markdown and/or HTML syntax and display that as a translucent
@@ -30,7 +31,18 @@
 
 		</div>
 	</div>
+	<div id="editor-container" class="hidden">
+		<div id="editor-toolbar">
+			<span class="toolbar-filename" id="toolbar-filename">No file open</span>
+			<span class="toolbar-dirty hidden" id="toolbar-dirty">(unsaved)</span>
+			<button id="btn-save" class="primary">Save</button>
+			<button id="btn-save-as">Save As</button>
+			<button id="btn-cancel">Cancel</button>
+		</div>
+		<div id="editor"></div>
+	</div>
 	<div id="resize-handle"></div>
+	<script src="./editor-bundle.js"></script>
 	<script type="module" src="./teleprompter.js"></script>
 </body>
 

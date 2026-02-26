@@ -2,7 +2,7 @@ import { defineConfig } from "eslint/config"; // eslint-disable-line n/no-unpubl
 import rg from "eslint-config-reverentgeek"; // eslint-disable-line n/no-unpublished-import
 
 export default defineConfig( [ {
-	ignores: [ "dist/" ]
+	ignores: [ "dist/", "src/client/editor-bundle.js" ]
 }, {
 	extends: [ rg.configs["node-esm"] ],
 	rules: {

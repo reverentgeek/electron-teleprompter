@@ -3,7 +3,7 @@
 ## Features
 
 - [ ] Auto-scroll mode — toggleable auto-scroll at configurable speed (words-per-minute), spacebar to toggle, up/down to adjust speed
-- [ ] Add a basic markdown editor
+- [x] Add a basic markdown editor (CodeMirror 6, Cmd+E toggle, Save/Save As)
 - [ ] Allow for custom CSS
 
 ## Completed
