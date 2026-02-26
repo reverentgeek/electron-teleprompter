@@ -7,12 +7,16 @@ async function convertMDtoHTML( md ) {
 }
 
 function injectHeadingAnchors( html ) {
+	const padding = "<p>&nbsp;</p>".repeat( 10 );
 	const regex = /<h2 [^>]*>/gm;
 	const matches = html.match( regex );
-	for ( let i = 0; i < matches.length; i++ ) {
-		html = html.replace( matches[i], `${ matches[i] }<a name="${ i }"></a>` );
+	if ( !matches ) {
+		return html + padding;
 	}
-	html += "<p>&nbsp;</p>".repeat( 10 );
+	for ( let i = 0; i < matches.length; i++ ) {
+		html = html.replace( matches[i], `<a name="${ i }"></a>${ matches[i] }` );
+	}
+	html += padding;
 	return html;
 }
 

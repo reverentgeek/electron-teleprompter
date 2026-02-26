@@ -9,7 +9,7 @@ export function buildMenus( browserWindow, watchFile ) {
 		{ label: "File", submenu: [
 			{
 				label: "Open",
-				accelerator: "Cmd+O",
+				accelerator: "CmdOrCtrl+O",
 				click: async () => {
 					const results = await dialog.showOpenDialog( browserWindow, {
 						properties: [ "openFile" ],
