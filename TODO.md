@@ -9,9 +9,3 @@
 - [ ] Mirror/flip mode — CSS `transform: scaleX(-1)` toggle for physical teleprompter setups with beam splitters
 - [ ] Drag-to-resize handle — visible resize affordance for the frameless window
 - [ ] Persist last opened file — auto-load it on next launch
-
-## Code Quality
-
-- [ ] Remove `console.log("size:", size)` in `forceRepaint` — fires on every content load, clutters logs
-- [ ] Comment the `forceRepaint` hack — explain why the resize +1/-1 exists, periodically check if newer Electron versions fix it
-- [ ] Replace `fs-extra` with `node:fs/promises` — only uses `readFile`, `readJSON`, `writeJSON`, and `pathExists`, all coverable with native APIs
