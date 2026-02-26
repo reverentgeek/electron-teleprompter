@@ -12,8 +12,6 @@ const MAX_RECENT_FILES = 10;
 const defaultConfig = {
 	width: 800,
 	height: 600,
-	x: 0,
-	y: 0,
 	fontSize: 3,
 	opacity: 0.07,
 	mirrored: false,
@@ -52,9 +50,8 @@ const createWindow = ( state ) => {
 	const win = new BrowserWindow( {
 		width: state.width,
 		height: state.height,
-		x: state.x,
-		y: state.y,
-		center: true,
+		...( state.x != null && state.y != null ? { x: state.x, y: state.y } : {} ),
+		center: state.x == null,
 		webPreferences: {
 			nodeIntegration: false,
 			sandbox: false,
