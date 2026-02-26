@@ -19,6 +19,20 @@ window.electron.onFontSize( ( size ) => {
 	setFontSize( size, false );
 } );
 
+let mirrored = false;
+
+function setMirrored( value, save = true ) {
+	mirrored = value;
+	document.body.style.transform = mirrored ? "scaleX(-1)" : "";
+	if ( save ) {
+		window.electron.saveMirrored( mirrored );
+	}
+}
+
+window.electron.onMirrored( ( value ) => {
+	setMirrored( value, false );
+} );
+
 function jumpToSection( index ) {
 	const url = location.href;
 	location.href = "#" + index;
@@ -50,6 +64,9 @@ document.addEventListener( "keydown", ( event ) => {
 	} else if ( ( event.metaKey || event.ctrlKey ) && event.key === "0" ) {
 		event.preventDefault();
 		setFontSize( DEFAULT_FONT_SIZE );
+	} else if ( ( event.metaKey || event.ctrlKey ) && event.key === "m" ) {
+		event.preventDefault();
+		setMirrored( !mirrored );
 	}
 } );
 

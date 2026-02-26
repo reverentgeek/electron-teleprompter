@@ -23,12 +23,16 @@ Use H2 tags (`##` in markdown) to create both headings and navigation points in 
 | `Cmd/Ctrl+Plus`  | Increase font size            |
 | `Cmd/Ctrl+Minus` | Decrease font size            |
 | `Cmd/Ctrl+0`     | Reset font size to default    |
+| `Cmd/Ctrl+M`     | Toggle mirror/flip mode       |
 
 ### Features
 
 - Translucent overlay — see through the script to your presentation or video call
 - Live reload — script automatically reloads when the file is modified externally
 - Font size is persisted across sessions
+- Mirror/flip mode — for physical teleprompter setups with beam splitters
+- Recently opened files — File > Open Recent submenu
+- Auto-loads last opened file on startup
 - Window position and size are persisted across sessions
 
 ### What is Markdown?

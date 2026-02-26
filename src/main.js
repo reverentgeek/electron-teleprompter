@@ -15,6 +15,7 @@ const defaultConfig = {
 	x: 0,
 	y: 0,
 	fontSize: 3,
+	mirrored: false,
 	recentFiles: []
 };
 
@@ -22,6 +23,7 @@ const stateManager = stateFactory( defaultConfig );
 let watcher;
 
 let currentFontSize = defaultConfig.fontSize;
+let currentMirrored = defaultConfig.mirrored;
 let recentFiles = [];
 
 function addRecentFile( filePath ) {
@@ -38,6 +40,7 @@ const saveState = async ( win ) => {
 		x: position[0],
 		y: position[1],
 		fontSize: currentFontSize,
+		mirrored: currentMirrored,
 		recentFiles
 	} );
 };
@@ -62,6 +65,7 @@ const createWindow = ( state ) => {
 
 	win.webContents.on( "did-finish-load", () => {
 		win.webContents.send( "fontSize", state.fontSize || defaultConfig.fontSize );
+		win.webContents.send( "mirrored", state.mirrored || false );
 	} );
 
 	win.on( "close", async () => {
@@ -98,10 +102,15 @@ const createWindow = ( state ) => {
 app.whenReady().then( async () => {
 	const state = await stateManager.readAppState();
 	currentFontSize = state.fontSize || defaultConfig.fontSize;
+	currentMirrored = state.mirrored || false;
 	recentFiles = state.recentFiles || [];
 
 	ipcMain.on( "fontSize", ( _event, size ) => {
 		currentFontSize = size;
+	} );
+
+	ipcMain.on( "mirrored", ( _event, value ) => {
+		currentMirrored = value;
 	} );
 
 	const { win, openScriptFile } = createWindow( state );
