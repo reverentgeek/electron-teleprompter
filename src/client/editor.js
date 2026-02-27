@@ -56,3 +56,8 @@ export function setEditorContent( view, content ) {
 export function getEditorContent( view ) {
 	return view.state.doc.toString();
 }
+
+export function getCursorLine( view ) {
+	const pos = view.state.selection.main.head;
+	return view.state.doc.lineAt( pos ).number;
+}

@@ -60,7 +60,11 @@ let isEditMode = false;
 let isDirty = false;
 let isLoadingContent = false;
 let isNewFile = false;
+let isSaving = false;
 let editorView = null;
+let previewManuallyScrolled = false;
+let pendingScrollToCursor = false;
+let savedScrollY = 0;
 
 const previewContainer = document.getElementById( "preview-container" );
 const editorContainer = document.getElementById( "editor-container" );
@@ -71,6 +75,34 @@ const btnSave = document.getElementById( "btn-save" );
 const btnSaveAs = document.getElementById( "btn-save-as" );
 const btnCancel = document.getElementById( "btn-cancel" );
 const resizeHandle = document.getElementById( "resize-handle" );
+
+// Track manual scrolling in preview mode
+let ignoreNextScroll = false;
+window.addEventListener( "scroll", () => {
+	if ( isEditMode ) return;
+	if ( ignoreNextScroll ) {
+		ignoreNextScroll = false;
+		return;
+	}
+	if ( window.scrollY > 0 ) {
+		previewManuallyScrolled = true;
+	}
+} );
+
+function scrollPreviewToCursorLine() {
+	if ( !editorView || !md ) return;
+	const cursorLine = window.EditorModule.getCursorLine( editorView );
+	const totalLines = editorView.state.doc.lines;
+	if ( totalLines <= 1 ) return;
+
+	// Use cursor line ratio to scroll the preview to the same relative position
+	const ratio = ( cursorLine - 1 ) / ( totalLines - 1 );
+	const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+	if ( maxScroll > 0 ) {
+		ignoreNextScroll = true;
+		window.scrollTo( 0, Math.round( ratio * maxScroll ) );
+	}
+}
 
 function setDirty( dirty ) {
 	isDirty = dirty;
@@ -98,6 +130,7 @@ function showPreview() {
 
 function enterEditMode() {
 	if ( isEditMode ) return;
+	savedScrollY = window.scrollY;
 	isEditMode = true;
 
 	window.electron.pauseWatcher();
@@ -110,7 +143,7 @@ function loadEditorContent( content, filePath ) {
 	showEditor();
 
 	if ( toolbarFilename ) {
-		toolbarFilename.textContent = filePath ? filePath : "New file";
+		toolbarFilename.textContent = filePath ? filePath.split( "/" ).pop() : "New file";
 	}
 	setDirty( false );
 
@@ -148,15 +181,19 @@ function toggleEditMode() {
 	if ( isEditMode ) {
 		// Switch to preview without discarding — keep editor state intact
 		isEditMode = false;
+		pendingScrollToCursor = !previewManuallyScrolled;
 		// Update preview with current editor content
 		if ( editorView ) {
 			const content = window.EditorModule.getEditorContent( editorView );
 			window.electron.previewMarkdown( content );
 		}
 		showPreview();
-	} else if ( editorView && isDirty ) {
+	} else if ( editorView ) {
+		// Save preview scroll position before switching to editor
+		savedScrollY = window.scrollY;
 		// Resume editing — just swap visibility back
 		isEditMode = true;
+		window.electron.pauseWatcher();
 		showEditor();
 		editorView.focus();
 	} else {
@@ -166,6 +203,7 @@ function toggleEditMode() {
 
 function saveEditorContent() {
 	if ( !editorView ) return;
+	isSaving = true;
 	const content = window.EditorModule.getEditorContent( editorView );
 	if ( isNewFile ) {
 		window.electron.saveFileAs( content );
@@ -176,6 +214,7 @@ function saveEditorContent() {
 
 function saveEditorContentAs() {
 	if ( !editorView ) return;
+	isSaving = true;
 	const content = window.EditorModule.getEditorContent( editorView );
 	window.electron.saveFileAs( content );
 }
@@ -185,11 +224,12 @@ let pendingSaveAndClose = false;
 
 // Listen for save result
 window.electron.onSaveResult( ( success, filePath ) => {
+	isSaving = false;
 	if ( success ) {
 		setDirty( false );
 		isNewFile = false;
 		if ( filePath && toolbarFilename ) {
-			toolbarFilename.textContent = filePath;
+			toolbarFilename.textContent = filePath.split( "/" ).pop();
 		}
 	}
 	if ( pendingSaveAndClose ) {
@@ -255,12 +295,16 @@ document.addEventListener( "keydown", ( event ) => {
 	// Suppress teleprompter shortcuts when in edit mode
 	if ( isEditMode ) return;
 
-	if ( event.key === "ArrowRight" ) {
+	if ( event.key === "ArrowDown" || event.key === "ArrowUp" ) {
+		// Allow default scroll behavior, but track it
+		previewManuallyScrolled = true;
+	} else if ( event.key === "ArrowRight" ) {
 		event.preventDefault();
 		// Advance to next section
 		const sections = document.getElementsByName( scriptIndex + 1 );
 		if ( sections.length > 0 ) {
 			scriptIndex++;
+			previewManuallyScrolled = true;
 			jumpToSection( scriptIndex );
 		}
 	} else if ( event.key === "ArrowLeft" ) {
@@ -268,6 +312,7 @@ document.addEventListener( "keydown", ( event ) => {
 		// Go back to previous section
 		if ( scriptIndex > 0 ) {
 			scriptIndex--;
+			previewManuallyScrolled = true;
 			jumpToSection( scriptIndex );
 		}
 	} else if ( ( event.metaKey || event.ctrlKey ) && !event.shiftKey && ( event.key === "=" || event.key === "+" ) ) {
@@ -323,10 +368,23 @@ if ( resizeHandle ) {
 window.electron.onContent( ( content ) => {
 	if ( md ) {
 		md.innerHTML = content;
-		scriptIndex = 0;
+		if ( pendingScrollToCursor ) {
+			pendingScrollToCursor = false;
+			requestAnimationFrame( () => scrollPreviewToCursorLine() );
+		} else if ( previewManuallyScrolled && !isSaving ) {
+			// Restore saved scroll position after layout completes
+			requestAnimationFrame( () => {
+				ignoreNextScroll = true;
+				window.scrollTo( 0, savedScrollY );
+			} );
+		} else if ( !isSaving ) {
+			scriptIndex = 0;
+			previewManuallyScrolled = false;
+		}
 	}
 	// If in edit mode, reload the editor with the new file's raw markdown
-	if ( isEditMode ) {
+	// (skip if the content update was triggered by our own save)
+	if ( isEditMode && !isSaving ) {
 		window.electron.requestRawMarkdown();
 	}
 } );

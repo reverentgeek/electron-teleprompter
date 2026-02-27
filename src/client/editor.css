@@ -10,7 +10,7 @@
 #editor-toolbar {
 	display: flex;
 	align-items: center;
-	padding: 6px 12px;
+	padding: 10px 12px;
 	background-color: #21252b;
 	border-bottom: 1px solid #181a1f;
 	-webkit-app-region: drag;
@@ -28,8 +28,9 @@
 }
 
 #editor-toolbar .toolbar-dirty {
-	color: #e5c07b;
-	margin-left: 4px;
+	color: #e06c75;
+	margin-right: 6px;
+	font-size: 10px;
 }
 
 #editor-toolbar button {

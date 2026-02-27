@@ -206,8 +206,8 @@ app.whenReady().then( async () => {
 				addRecentFile( result.filePath );
 				buildMenus( win, moduleOpenScriptFile, recentFiles );
 				const md = await readAndConvertMarkdown( result.filePath );
-				win.webContents.send( "saveResult", true, result.filePath );
 				win.webContents.send( "content", md );
+				win.webContents.send( "saveResult", true, result.filePath );
 			} catch ( err ) {
 				console.log( "Save As error:", err );
 				win.webContents.send( "saveResult", false, null );
@@ -221,8 +221,8 @@ app.whenReady().then( async () => {
 				await fs.writeFile( currentFilePath, content, { encoding: "utf-8" } );
 				hasUnsavedChanges = false;
 				const md = await readAndConvertMarkdown( currentFilePath );
-				win.webContents.send( "saveResult", true, currentFilePath );
 				win.webContents.send( "content", md );
+				win.webContents.send( "saveResult", true, currentFilePath );
 			} catch ( err ) {
 				console.log( "Save error:", err );
 				win.webContents.send( "saveResult", false, currentFilePath );
