@@ -7,10 +7,10 @@
 	"type": "module",
 	"scripts": {
 		"build:editor": "esbuild src/client/editor.js --bundle --format=iife --global-name=EditorModule --outfile=src/client/editor-bundle.js",
-		"prestart": "npm run build:editor",
+		"prestart": "pnpm build:editor",
 		"start": "electron .",
-		"prebuild": "npm run build:editor",
-		"build": "npx @electron/packager --overwrite ./ --out ./dist --ignore=\"/node_modules/\\.ignored\" --ignore=\"/node_modules/(electron|@electron|eslint)\"",
+		"prebuild": "pnpm build:editor",
+		"build": "pnpm dlx @electron/packager --overwrite ./ --out ./dist --ignore=\"/node_modules/\\.ignored\" --ignore=\"/node_modules/(electron|@electron|eslint)\"",
 		"lint": "eslint --fix"
 	},
 	"author": "David Neal <david@reverentgeek.com>",
@@ -23,24 +23,25 @@
 		"node": ">=22.16.0"
 	},
 	"devDependencies": {
+		"@codemirror/lang-markdown": "^6.5.0",
+		"@codemirror/language-data": "^6.5.2",
+		"@codemirror/state": "^6.5.4",
+		"@codemirror/theme-one-dark": "^6.1.3",
 		"@electron/packager": "^19.0.5",
+		"codemirror": "^6.0.2",
 		"electron": "^40.6.1",
-		"esbuild": "^0.25.0",
+		"esbuild": "^0.25.12",
 		"eslint": "^10.0.2",
 		"eslint-config-reverentgeek": "^7.0.3"
 	},
 	"dependencies": {
-		"@codemirror/lang-markdown": "^6.3.2",
-		"@codemirror/language-data": "^6.5.0",
-		"@codemirror/state": "^6.5.4",
-		"@codemirror/theme-one-dark": "^6.1.2",
 		"chokidar": "^5.0.0",
-		"codemirror": "^6.0.1",
 		"showdown": "^2.1.0"
 	},
-	"packageManager": "pnpm@10.30.2+sha512.36cdc707e7b7940a988c9c1ecf88d084f8514b5c3f085f53a2e244c2921d3b2545bc20dd4ebe1fc245feec463bb298aecea7a63ed1f7680b877dc6379d8d0cb4",
+	"packageManager": "pnpm@10.30.3+sha512.c961d1e0a2d8e354ecaa5166b822516668b7f44cb5bd95122d590dd81922f606f5473b6d23ec4a5be05e7fcd18e8488d47d978bbe981872f1145d06e9a740017",
 	"pnpm": {
 		"onlyBuiltDependencies": [
+			"electron",
 			"esbuild"
 		]
 	}
