@@ -28,14 +28,14 @@ importers:
         specifier: ^6.1.3
         version: 6.1.3
       '@electron/packager':
-        specifier: ^19.0.5
-        version: 19.0.5
+        specifier: ^19.1.0
+        version: 19.1.0
       codemirror:
         specifier: ^6.0.2
         version: 6.0.2
       electron:
-        specifier: ^41.0.1
-        version: 41.0.1
+        specifier: ^41.0.2
+        version: 41.0.2
       esbuild:
         specifier: ^0.27.4
         version: 0.27.4
@@ -163,8 +163,8 @@ packages:
     engines: {node: '>=22.12.0'}
     hasBin: true
 
-  '@electron/packager@19.0.5':
-    resolution: {integrity: sha512-HSWJp5ZTYkavzoLViPBK8sUaINrHbhHMueMrYpQea5DkzOplxYCgAKmy+FKsBk7WUm6iYZZ0gJe8f8nIEScqJQ==}
+  '@electron/packager@19.1.0':
+    resolution: {integrity: sha512-VXKWdnsFglv4LyXTxO18j8GifBw5OKy7k28b8tLf69dDkRVeLcnQ/VBNcN4YmBC7phGZPWfeIp9DqCCKrqdypQ==}
     engines: {node: '>= 22.12.0'}
     hasBin: true
 
@@ -649,8 +649,8 @@ packages:
   dir-compare@4.2.0:
     resolution: {integrity: sha512-2xMCmOoMrdQIPHdsTawECdNPwlVFB9zGcz3kuhmBO6U3oU+UQjsue0i8ayLKpgBcm+hcXPMVSGUN9d+pvJ6+VQ==}
 
-  electron@41.0.1:
-    resolution: {integrity: sha512-VElEzqqlqQJla59NF7TPf9u7yGX1NEpVz94ZNp/dMRUMPJHcc9kuP7C4ODbNzzevjhChw9gB4NT6osNpN5qjJA==}
+  electron@41.0.2:
+    resolution: {integrity: sha512-raotm/aO8kOs1jD8SI8ssJ7EKciQOY295AOOprl1TxW7B0At8m5Ae7qNU1xdMxofiHMR8cNEGi9PKD3U+yT/mA==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -997,8 +997,8 @@ packages:
     resolution: {integrity: sha512-ozCC6gdQ+glXOQsveKD0YsDy8DSQFjDTz4zyzEHNV5+JP5D62LmfDZ6o1cycFx9ouG940M5dE8C8CTewdj2YWQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  lru-cache@11.2.6:
-    resolution: {integrity: sha512-ESL2CrkS/2wTPfuend7Zhkzo2u0daGJ/A2VucJOgQ/C48S/zB8MMeMHSGKYpXhIjbPxfuezITkaBH1wqv00DDQ==}
+  lru-cache@11.2.7:
+    resolution: {integrity: sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==}
     engines: {node: 20 || >=22}
 
   matcher@3.0.0:
@@ -1653,7 +1653,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@electron/packager@19.0.5':
+  '@electron/packager@19.1.0':
     dependencies:
       '@electron/asar': 4.1.0
       '@electron/get': 4.0.2
@@ -2123,7 +2123,7 @@ snapshots:
       minimatch: 3.1.5
       p-limit: 3.1.0
 
-  electron@41.0.1:
+  electron@41.0.2:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 24.12.0
@@ -2551,7 +2551,7 @@ snapshots:
 
   lowercase-keys@3.0.0: {}
 
-  lru-cache@11.2.6: {}
+  lru-cache@11.2.7: {}
 
   matcher@3.0.0:
     dependencies:
@@ -2651,7 +2651,7 @@ snapshots:
 
   path-scurry@2.0.2:
     dependencies:
-      lru-cache: 11.2.6
+      lru-cache: 11.2.7
       minipass: 7.1.3
 
   path-type@2.0.0:
