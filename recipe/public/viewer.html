@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Viewer — LiveKit + Deepgram recipe</title>
+	<style>
+		body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2em auto; padding: 0 1em; color: #222; }
+		h1 { font-size: 1.4em; }
+		button { font-size: 1em; padding: 0.5em 1em; margin-right: 0.5em; }
+		.row { margin: 1em 0; }
+		.status { padding: 0.5em 0.75em; border-radius: 4px; background: #eef; margin-bottom: 1em; font-size: 0.9em; }
+		.status.live { background: #dfd; }
+		.status.error { background: #fdd; }
+		input[type="text"] { font-size: 1em; padding: 0.4em; width: 14em; }
+		#transcript { font-family: ui-monospace, monospace; background: #f6f6f6; padding: 0.75em; border-radius: 4px; min-height: 8em; white-space: pre-wrap; }
+		.muted { color: #777; }
+	</style>
+</head>
+<body>
+	<h1>Viewer</h1>
+	<p class="muted">Subscribes to the presenter's audio track and prints each transcript message received on the LiveKit data channel.</p>
+
+	<div class="row">
+		<label>Room name: <input id="room" type="text"></label>
+		<button id="join-btn" type="button">Join</button>
+		<button id="leave-btn" type="button" disabled>Leave</button>
+		<button id="mute-btn" type="button" disabled>Unmute audio</button>
+	</div>
+
+	<div id="status" class="status">Not connected.</div>
+
+	<h2>Live transcript</h2>
+	<div id="transcript"></div>
+	<audio id="audio" autoplay playsinline muted></audio>
+
+	<script type="module">
+		import { Room, RoomEvent, Track } from "https://cdn.skypack.dev/livekit-client@2";
+
+		const $ = ( id ) => document.getElementById( id );
+		const status = $( "status" );
+		const transcript = $( "transcript" );
+		const audio = $( "audio" );
+
+		let room = null;
+
+		function setStatus( text, variant ) {
+			status.textContent = text;
+			status.className = "status" + ( variant ? " " + variant : "" );
+		}
+
+		async function join() {
+			const roomName = $( "room" ).value.trim();
+			if ( !roomName ) { setStatus( "Enter a room name first.", "error" ); return; }
+			$( "join-btn" ).disabled = true;
+
+			try {
+				const tokenRes = await fetch( `/api/token?room=${ encodeURIComponent( roomName ) }&role=viewer` ).then( r => r.json() );
+				if ( tokenRes.error ) throw new Error( tokenRes.error );
+
+				const decoder = new TextDecoder();
+				room = new Room();
+
+				let firstAudioAttach = true;
+				room.on( RoomEvent.TrackSubscribed, ( track ) => {
+					if ( track.kind === Track.Kind.Audio ) {
+						track.attach( audio );
+						// LiveKit's attachToElement forces element.muted = false; re-mute on first
+						// attach so the viewer defaults to silent and must opt in.
+						if ( firstAudioAttach ) {
+							audio.muted = true;
+							firstAudioAttach = false;
+						}
+					}
+				} );
+				room.on( RoomEvent.DataReceived, ( payload ) => {
+					try {
+						const msg = JSON.parse( decoder.decode( payload ) );
+						if ( msg.type === "transcript" && msg.text ) {
+							transcript.textContent += ( transcript.textContent ? " " : "" ) + msg.text;
+						}
+					} catch {}
+				} );
+				room.on( RoomEvent.Disconnected, () => setStatus( "Disconnected." ) );
+
+				await room.connect( tokenRes.url, tokenRes.token );
+				$( "leave-btn" ).disabled = false;
+				$( "mute-btn" ).disabled = false;
+				setStatus( `Subscribed to room: ${ roomName }. Audio starts muted.`, "live" );
+			} catch ( err ) {
+				console.error( err );
+				setStatus( `Error: ${ err.message }`, "error" );
+				$( "join-btn" ).disabled = false;
+			}
+		}
+
+		async function leave() {
+			if ( room ) { try { await room.disconnect(); } catch {} room = null; }
+			$( "join-btn" ).disabled = false;
+			$( "leave-btn" ).disabled = true;
+			$( "mute-btn" ).disabled = true;
+			setStatus( "Left." );
+		}
+
+		$( "join-btn" ).addEventListener( "click", join );
+		$( "leave-btn" ).addEventListener( "click", leave );
+		$( "mute-btn" ).addEventListener( "click", () => {
+			audio.muted = !audio.muted;
+			$( "mute-btn" ).textContent = audio.muted ? "Unmute audio" : "Mute audio";
+		} );
+	</script>
+</body>
+</html>

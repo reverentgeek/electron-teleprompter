@@ -4,8 +4,8 @@
 <head>
 	<meta charset="UTF-8">
 	<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
-	<meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss: https:; media-src 'self' blob:; img-src 'self' data:">
+	<meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss: https:; media-src 'self' blob:; img-src 'self' data:">
 	<title>Electron Teleprompter</title>
 	<link rel="stylesheet" type="text/css" href="teleprompter.css">
 	<link rel="stylesheet" type="text/css" href="editor.css">
@@ -41,8 +41,28 @@
 		</div>
 		<div id="editor"></div>
 	</div>
+	<div id="viewer-toolbar" class="hidden">
+		<span id="viewer-room-label">Live</span>
+		<button id="viewer-mute-btn" type="button">Unmute</button>
+		<button id="viewer-leave-btn" type="button">Leave</button>
+	</div>
+	<div id="connection-indicator" class="hidden" title="Click to copy room name"></div>
+	<button id="presenter-leave-btn" class="hidden" type="button">Leave</button>
+	<div id="join-modal" class="hidden">
+		<div id="join-modal-content">
+			<h3>Join Session</h3>
+			<p>Enter the room name shared by the presenter:</p>
+			<input id="join-modal-input" type="text" placeholder="tp-xxxxxx" autocomplete="off" spellcheck="false">
+			<div id="join-modal-actions">
+				<button id="join-modal-cancel" type="button">Cancel</button>
+				<button id="join-modal-confirm" type="button">Join</button>
+			</div>
+		</div>
+	</div>
+	<audio id="presenter-audio" autoplay playsinline muted></audio>
 	<div id="resize-handle"></div>
 	<script src="./editor-bundle.js"></script>
+	<script src="./livekit-bundle.js"></script>
 	<script type="module" src="./teleprompter.js"></script>
 </body>
 

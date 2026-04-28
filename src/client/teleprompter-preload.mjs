@@ -26,5 +26,23 @@ contextBridge.exposeInMainWorld( "electron", {
 	onMenuSaveAs: callback => ipcRenderer.on( "menuSaveAs", () => callback() ),
 	onNewFile: callback => ipcRenderer.on( "newFile", () => callback() ),
 	previewMarkdown: markdown => ipcRenderer.send( "previewMarkdown", markdown ),
-	reloadContent: () => ipcRenderer.send( "reloadContent" )
+	reloadContent: () => ipcRenderer.send( "reloadContent" ),
+	copyToClipboard: text => ipcRenderer.send( "copyToClipboard", text ),
+
+	// LiveKit session IPC
+	startLiveKitSession: () => ipcRenderer.send( "startLiveKitSession" ),
+	joinLiveKitSession: roomName => ipcRenderer.send( "joinLiveKitSession", { roomName } ),
+	leaveLiveKitSession: () => ipcRenderer.send( "leaveLiveKitSession" ),
+	getDeepgramKey: () => ipcRenderer.send( "getDeepgramKey" ),
+	onLiveKitSessionStarted: callback => ipcRenderer.on( "liveKitSessionStarted", ( _event, payload ) => callback( payload ) ),
+	onLiveKitSessionJoined: callback => ipcRenderer.on( "liveKitSessionJoined", ( _event, payload ) => callback( payload ) ),
+	onLiveKitSessionLeft: callback => ipcRenderer.on( "liveKitSessionLeft", () => callback() ),
+	onLiveKitSessionError: callback => ipcRenderer.on( "liveKitSessionError", ( _event, payload ) => callback( payload ) ),
+	onDeepgramKey: callback => ipcRenderer.on( "deepgramKey", ( _event, payload ) => callback( payload ) ),
+	onMenuStartSession: callback => ipcRenderer.on( "menuStartSession", () => callback() ),
+	onMenuJoinSession: callback => ipcRenderer.on( "menuJoinSession", () => callback() ),
+	onMenuLeaveSession: callback => ipcRenderer.on( "menuLeaveSession", () => callback() ),
+	onBootstrapJoin: callback => ipcRenderer.on( "bootstrapJoin", ( _event, payload ) => callback( payload ) ),
+	onBootstrapStartSession: callback => ipcRenderer.on( "bootstrapStartSession", () => callback() ),
+	leaveAndShowLauncher: () => ipcRenderer.send( "leaveAndShowLauncher" )
 } );

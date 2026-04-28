@@ -66,6 +66,16 @@ let previewManuallyScrolled = false;
 let pendingScrollToCursor = false;
 let savedScrollY = 0;
 
+// --- Session state ---
+let sessionMode = null; // null | "presenter" | "viewer"
+let sessionRoomName = null;
+let pendingPresenterCredentials = null;
+let pendingDeepgramKey = null;
+let presenterCtx = null;
+let pendingStartSession = false;
+let lastManualScrollTs = 0;
+const MANUAL_SCROLL_GRACE_MS = 3000;
+
 const previewContainer = document.getElementById( "preview-container" );
 const editorContainer = document.getElementById( "editor-container" );
 const editorDiv = document.getElementById( "editor" );
@@ -75,6 +85,17 @@ const btnSave = document.getElementById( "btn-save" );
 const btnSaveAs = document.getElementById( "btn-save-as" );
 const btnCancel = document.getElementById( "btn-cancel" );
 const resizeHandle = document.getElementById( "resize-handle" );
+const connectionIndicator = document.getElementById( "connection-indicator" );
+const viewerToolbar = document.getElementById( "viewer-toolbar" );
+const viewerRoomLabel = document.getElementById( "viewer-room-label" );
+const viewerMuteBtn = document.getElementById( "viewer-mute-btn" );
+const viewerLeaveBtn = document.getElementById( "viewer-leave-btn" );
+const presenterAudio = document.getElementById( "presenter-audio" );
+const joinModal = document.getElementById( "join-modal" );
+const joinModalInput = document.getElementById( "join-modal-input" );
+const joinModalCancel = document.getElementById( "join-modal-cancel" );
+const joinModalConfirm = document.getElementById( "join-modal-confirm" );
+const presenterLeaveBtn = document.getElementById( "presenter-leave-btn" );
 
 // Track manual scrolling in preview mode
 let ignoreNextScroll = false;
@@ -88,6 +109,19 @@ window.addEventListener( "scroll", () => {
 		previewManuallyScrolled = true;
 	}
 } );
+
+function noteManualScroll() {
+	if ( sessionMode === "presenter" ) {
+		lastManualScrollTs = Date.now();
+		window.LiveKitModule?.cancelScroll?.();
+	}
+}
+window.addEventListener( "wheel", noteManualScroll, { passive: true } );
+window.addEventListener( "mousedown", noteManualScroll );
+const SCROLL_KEYS = new Set( [ "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End", " " ] );
+document.addEventListener( "keydown", ( e ) => {
+	if ( SCROLL_KEYS.has( e.key ) ) noteManualScroll();
+}, true );
 
 function scrollPreviewToCursorLine() {
 	if ( !editorView || !md ) return;
@@ -239,7 +273,13 @@ window.electron.onSaveResult( ( success, filePath ) => {
 } );
 
 // Listen for toggle editor from menu
-window.electron.onToggleEditor( toggleEditMode );
+window.electron.onToggleEditor( () => {
+	if ( sessionMode ) {
+		alert( "Leave the live session before opening the editor." );
+		return;
+	}
+	toggleEditMode();
+} );
 
 // New file — enter edit mode with empty content
 window.electron.onNewFile( () => {
@@ -294,6 +334,13 @@ if ( btnCancel ) {
 document.addEventListener( "keydown", ( event ) => {
 	// Suppress teleprompter shortcuts when in edit mode
 	if ( isEditMode ) return;
+	// In viewer mode, scrolling is driven by the presenter — block manual nav.
+	if ( sessionMode === "viewer" ) {
+		if ( event.key === "ArrowRight" || event.key === "ArrowLeft" || event.key === "ArrowUp" || event.key === "ArrowDown" ) {
+			event.preventDefault();
+			return;
+		}
+	}
 
 	if ( event.key === "ArrowDown" || event.key === "ArrowUp" ) {
 		// Allow default scroll behavior, but track it
@@ -387,4 +434,280 @@ window.electron.onContent( ( content ) => {
 	if ( isEditMode && !isSaving ) {
 		window.electron.requestRawMarkdown();
 	}
+	// Auto-start a session if the launcher requested one. Wait one frame so
+	// the new content is laid out before we build the word index.
+	if ( pendingStartSession && !sessionMode && !isEditMode ) {
+		pendingStartSession = false;
+		requestAnimationFrame( () => startPresenterSession() );
+	}
+} );
+
+// --- Live session orchestration ---
+
+function setIndicator( text, variant ) {
+	if ( !connectionIndicator ) return;
+	if ( !text ) {
+		connectionIndicator.classList.add( "hidden" );
+		connectionIndicator.textContent = "";
+		return;
+	}
+	connectionIndicator.textContent = text;
+	connectionIndicator.classList.remove( "hidden", "viewer", "disconnected" );
+	if ( variant ) connectionIndicator.classList.add( variant );
+}
+
+function setViewerToolbar( visible ) {
+	if ( !viewerToolbar ) return;
+	viewerToolbar.classList.toggle( "hidden", !visible );
+}
+
+function setPresenterToolbar( visible ) {
+	if ( !presenterLeaveBtn ) return;
+	presenterLeaveBtn.classList.toggle( "hidden", !visible );
+}
+
+if ( connectionIndicator ) {
+	connectionIndicator.addEventListener( "click", () => {
+		if ( sessionMode === "presenter" && sessionRoomName ) {
+			window.electron.copyToClipboard( sessionRoomName );
+			const orig = connectionIndicator.textContent;
+			connectionIndicator.textContent = "Copied!";
+			setTimeout( () => {
+				if ( sessionMode === "presenter" ) {
+					connectionIndicator.textContent = orig;
+				}
+			}, 1200 );
+		}
+	} );
+}
+
+function showJoinModal() {
+	return new Promise( ( resolve ) => {
+		if ( !joinModal ) {
+			resolve( null );
+			return;
+		}
+		joinModalInput.value = "";
+		joinModal.classList.remove( "hidden" );
+		setTimeout( () => joinModalInput.focus(), 0 );
+
+		function cleanup() {
+			joinModal.classList.add( "hidden" );
+			joinModalConfirm.removeEventListener( "click", onConfirm );
+			joinModalCancel.removeEventListener( "click", onCancel );
+			joinModalInput.removeEventListener( "keydown", onKey );
+		}
+		function onConfirm() {
+			const v = joinModalInput.value.trim();
+			cleanup();
+			resolve( v || null );
+		}
+		function onCancel() {
+			cleanup();
+			resolve( null );
+		}
+		function onKey( e ) {
+			if ( e.key === "Enter" ) onConfirm();
+			else if ( e.key === "Escape" ) onCancel();
+		}
+		joinModalConfirm.addEventListener( "click", onConfirm );
+		joinModalCancel.addEventListener( "click", onCancel );
+		joinModalInput.addEventListener( "keydown", onKey );
+	} );
+}
+
+if ( viewerLeaveBtn ) {
+	viewerLeaveBtn.addEventListener( "click", () => {
+		leaveSession();
+	} );
+}
+
+if ( presenterLeaveBtn ) {
+	presenterLeaveBtn.addEventListener( "click", () => {
+		leaveSession();
+	} );
+}
+
+if ( viewerMuteBtn && presenterAudio ) {
+	presenterAudio.muted = true;
+	viewerMuteBtn.textContent = "Unmute";
+	viewerMuteBtn.addEventListener( "click", () => {
+		presenterAudio.muted = !presenterAudio.muted;
+		viewerMuteBtn.textContent = presenterAudio.muted ? "Unmute" : "Mute";
+	} );
+}
+
+async function startPresenterSession() {
+	if ( sessionMode ) {
+		alert( `Already in a ${ sessionMode } session.` );
+		return;
+	}
+	if ( isEditMode ) {
+		alert( "Exit the editor before starting a session." );
+		return;
+	}
+	if ( !window.LiveKitModule ) {
+		alert( "LiveKit module not loaded." );
+		return;
+	}
+	pendingPresenterCredentials = null;
+	pendingDeepgramKey = null;
+	window.electron.startLiveKitSession();
+}
+
+async function tryStartPresenterFlow() {
+	if ( !pendingPresenterCredentials || !pendingDeepgramKey ) return;
+	const creds = pendingPresenterCredentials;
+	const dgKey = pendingDeepgramKey;
+	pendingPresenterCredentials = null;
+	pendingDeepgramKey = null;
+
+	if ( !dgKey.key ) {
+		alert( `Cannot start session: ${ dgKey.error || "Deepgram key missing." }` );
+		window.electron.leaveLiveKitSession();
+		return;
+	}
+
+	try {
+		presenterCtx = await window.LiveKitModule.startPresenter( {
+			url: creds.url,
+			token: creds.token,
+			deepgramKey: dgKey.key,
+			scriptEl: md,
+			onStatus: handlePresenterStatus
+		} );
+		sessionMode = "presenter";
+		sessionRoomName = creds.roomName;
+		lastManualScrollTs = 0;
+		setIndicator( `Live: ${ creds.roomName }` );
+		setPresenterToolbar( true );
+	} catch ( err ) {
+		console.error( "[presenter] failed to start", err );
+		alert( `Failed to start session: ${ err.message }` );
+		window.electron.leaveLiveKitSession();
+	}
+}
+
+function handlePresenterStatus( status ) {
+	if ( status.type === "position" && presenterCtx?.wordIndex ) {
+		// Honor a manual-scroll grace period — when the presenter scrolls or
+		// uses arrow/page keys, suppress auto-scroll briefly so they can look
+		// ahead. Auto-scroll resumes naturally once they keep talking past
+		// the grace window.
+		if ( Date.now() - lastManualScrollTs >= MANUAL_SCROLL_GRACE_MS ) {
+			window.LiveKitModule.scrollToWord( status.wordIdx, presenterCtx.wordIndex.ranges );
+		}
+		return;
+	}
+	if ( status.type === "disconnected" ) {
+		sessionMode = null;
+		sessionRoomName = null;
+		setIndicator( "Disconnected", "disconnected" );
+		setPresenterToolbar( false );
+		setTimeout( () => {
+			if ( sessionMode === null ) setIndicator( null );
+		}, 2000 );
+	}
+}
+
+async function joinPresenterSession() {
+	if ( sessionMode ) {
+		alert( `Already in a ${ sessionMode } session.` );
+		return;
+	}
+	if ( isEditMode ) {
+		alert( "Exit the editor before joining a session." );
+		return;
+	}
+	const roomName = await showJoinModal();
+	if ( !roomName ) return;
+	window.electron.joinLiveKitSession( roomName );
+}
+
+async function tryJoinViewerFlow( creds ) {
+	try {
+		await window.LiveKitModule.joinViewer( {
+			url: creds.url,
+			token: creds.token,
+			scriptEl: md,
+			audioEl: presenterAudio,
+			onStatus: handleViewerStatus,
+			onWelcome: () => {},
+			onPosition: () => {}
+		} );
+		sessionMode = "viewer";
+		sessionRoomName = creds.roomName;
+		setIndicator( `Viewing: ${ creds.roomName }`, "viewer" );
+		if ( viewerRoomLabel ) viewerRoomLabel.textContent = creds.roomName;
+		setViewerToolbar( true );
+	} catch ( err ) {
+		console.error( "[viewer] failed to join", err );
+		alert( `Failed to join session: ${ err.message }` );
+		window.electron.leaveLiveKitSession();
+	}
+}
+
+function handleViewerStatus( status ) {
+	if ( status.type === "presenter-disconnected" ) {
+		setIndicator( "Presenter disconnected", "disconnected" );
+	} else if ( status.type === "disconnected" ) {
+		sessionMode = null;
+		sessionRoomName = null;
+		setIndicator( null );
+		setViewerToolbar( false );
+	}
+}
+
+async function leaveSession() {
+	const wasPresenter = sessionMode === "presenter";
+	const wasViewer = sessionMode === "viewer";
+	sessionMode = null;
+	sessionRoomName = null;
+	presenterCtx = null;
+	setIndicator( null );
+	setViewerToolbar( false );
+	setPresenterToolbar( false );
+	try {
+		if ( wasPresenter ) {
+			await window.LiveKitModule.stopPresenter();
+		} else if ( wasViewer ) {
+			await window.LiveKitModule.leaveViewer();
+		}
+	} catch ( err ) {
+		console.warn( "leaveSession error", err );
+	}
+	window.electron.leaveAndShowLauncher();
+}
+
+window.electron.onMenuStartSession( startPresenterSession );
+window.electron.onMenuJoinSession( joinPresenterSession );
+window.electron.onMenuLeaveSession( leaveSession );
+
+window.electron.onLiveKitSessionStarted( ( credentials ) => {
+	pendingPresenterCredentials = credentials;
+	window.electron.getDeepgramKey();
+} );
+window.electron.onDeepgramKey( ( payload ) => {
+	pendingDeepgramKey = payload;
+	tryStartPresenterFlow();
+} );
+window.electron.onLiveKitSessionJoined( ( credentials ) => {
+	tryJoinViewerFlow( credentials );
+} );
+window.electron.onLiveKitSessionLeft( () => {
+	// Main has cleared session state; renderer cleanup already done in leaveSession.
+} );
+window.electron.onLiveKitSessionError( ( payload ) => {
+	pendingPresenterCredentials = null;
+	pendingDeepgramKey = null;
+	alert( `Session error: ${ payload.message }` );
+} );
+
+window.electron.onBootstrapJoin( ( { roomName } ) => {
+	if ( sessionMode || isEditMode || !roomName ) return;
+	window.electron.joinLiveKitSession( roomName );
+} );
+
+window.electron.onBootstrapStartSession( () => {
+	pendingStartSession = true;
 } );

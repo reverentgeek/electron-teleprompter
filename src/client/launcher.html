@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+	<title>Electron Teleprompter</title>
+	<link rel="stylesheet" type="text/css" href="launcher.css">
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Electron Teleprompter</h1>
+			<p class="subtitle">Choose how to begin.</p>
+		</header>
+
+		<section class="option">
+			<h2>Start a Presentation</h2>
+			<p>Open a script file from your computer.</p>
+			<button id="start-btn" type="button">Start a Presentation</button>
+		</section>
+
+		<div class="divider"><span>OR</span></div>
+
+		<section class="option">
+			<h2>Join a Presentation</h2>
+			<p>Enter a room code shared by the presenter.</p>
+			<div class="join-row">
+				<input id="room-code" type="text" placeholder="tp-xxxxxx" autocomplete="off" spellcheck="false">
+				<button id="join-btn" type="button">Join</button>
+			</div>
+		</section>
+	</div>
+	<script type="module" src="./launcher.js"></script>
+</body>
+</html>

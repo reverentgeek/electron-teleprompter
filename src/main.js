@@ -1,10 +1,13 @@
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { app, BrowserWindow, clipboard, dialog, ipcMain } from "electron";
 import path from "node:path";
 import fs from "node:fs/promises";
 import chokidar from "chokidar";
+import "dotenv/config";
 import stateFactory from "./utils/state.js";
 import { convertMarkdown, readAndConvertMarkdown, readRawMarkdown } from "./utils/content.js";
 import { buildMenus } from "./menus.js";
+import { mintToken } from "./livekit/tokens.js";
+import { generateRoomName, generateIdentity, setSession, clearSession, getSession } from "./livekit/session.js";
 
 const __dirname = import.meta.dirname;
 
@@ -16,7 +19,8 @@ const defaultConfig = {
 	fontSize: 3,
 	opacity: 0.07,
 	mirrored: false,
-	recentFiles: []
+	recentFiles: [],
+	lastSession: { roomName: null, role: null }
 };
 
 const stateManager = stateFactory( defaultConfig );
@@ -31,6 +35,7 @@ let currentFilePath = null;
 let hasUnsavedChanges = false;
 let isClosing = false;
 let moduleOpenScriptFile = null;
+let currentLastSession = defaultConfig.lastSession;
 
 function addRecentFile( filePath ) {
 	recentFiles = [ filePath, ...recentFiles.filter( f => f !== filePath ) ].slice( 0, MAX_RECENT_FILES );
@@ -48,11 +53,12 @@ const saveState = async ( win ) => {
 		fontSize: currentFontSize,
 		opacity: currentOpacity,
 		mirrored: currentMirrored,
-		recentFiles
+		recentFiles,
+		lastSession: currentLastSession
 	} );
 };
 
-const createWindow = ( state ) => {
+const createWindow = ( state, bootstrap = {} ) => {
 	const win = new BrowserWindow( {
 		width: state.width,
 		height: state.height,
@@ -67,12 +73,26 @@ const createWindow = ( state ) => {
 		frame: false
 	} );
 
+	win.webContents.session.setPermissionRequestHandler( ( _wc, permission, callback ) => {
+		if ( permission === "media" ) {
+			callback( true );
+			return;
+		}
+		callback( false );
+	} );
+
 	win.loadFile( path.join( __dirname, "client", "teleprompter.html" ) );
 
 	win.webContents.on( "did-finish-load", () => {
 		win.webContents.send( "fontSize", state.fontSize || defaultConfig.fontSize );
 		win.webContents.send( "opacity", state.opacity ?? defaultConfig.opacity );
 		win.webContents.send( "mirrored", state.mirrored || false );
+		if ( bootstrap.joinRoom ) {
+			win.webContents.send( "bootstrapJoin", { roomName: bootstrap.joinRoom } );
+		}
+		if ( bootstrap.startSession ) {
+			win.webContents.send( "bootstrapStartSession" );
+		}
 	} );
 
 	win.on( "close", async ( event ) => {
@@ -155,27 +175,62 @@ const createWindow = ( state ) => {
 	return { win, openScriptFile };
 };
 
-app.whenReady().then( async () => {
-	const state = await stateManager.readAppState();
-	currentFontSize = state.fontSize || defaultConfig.fontSize;
-	currentOpacity = state.opacity ?? defaultConfig.opacity;
-	currentMirrored = state.mirrored || false;
-	recentFiles = state.recentFiles || [];
+let launcherWin = null;
+let teleprompterWin = null;
+let teleprompterBooted = false;
 
-	ipcMain.on( "fontSize", ( _event, size ) => {
-		currentFontSize = size;
+function showLauncher() {
+	launcherWin = new BrowserWindow( {
+		width: 480,
+		height: 420,
+		resizable: false,
+		minimizable: false,
+		maximizable: false,
+		fullscreenable: false,
+		center: true,
+		title: "Electron Teleprompter",
+		webPreferences: {
+			nodeIntegration: false,
+			sandbox: false,
+			preload: path.join( __dirname, "client", "launcher-preload.mjs" )
+		}
 	} );
-
-	ipcMain.on( "opacity", ( _event, value ) => {
-		currentOpacity = value;
+	launcherWin.loadFile( path.join( __dirname, "client", "launcher.html" ) );
+	launcherWin.on( "closed", () => {
+		launcherWin = null;
+		if ( !teleprompterBooted ) {
+			app.quit();
+		}
 	} );
+}
 
-	ipcMain.on( "mirrored", ( _event, value ) => {
-		currentMirrored = value;
+function closeLauncher() {
+	if ( launcherWin ) {
+		const w = launcherWin;
+		launcherWin = null;
+		w.destroy();
+	}
+}
+
+function bootTeleprompter( state, bootstrap ) {
+	if ( teleprompterBooted ) return;
+	teleprompterBooted = true;
+	const { win, openScriptFile } = createWindow( state, bootstrap );
+	teleprompterWin = win;
+	win.on( "closed", () => {
+		teleprompterWin = null;
+		teleprompterBooted = false;
 	} );
+	registerTeleprompterIpc( win );
+	if ( bootstrap.filePath ) {
+		win.webContents.once( "did-finish-load", () => {
+			openScriptFile( bootstrap.filePath );
+		} );
+	}
+	closeLauncher();
+}
 
-	const { win, openScriptFile } = createWindow( state );
-
+function registerTeleprompterIpc( win ) {
 	ipcMain.on( "resizeWindow", ( _event, width, height ) => {
 		win.setSize( width, height, false );
 	} );
@@ -268,10 +323,118 @@ app.whenReady().then( async () => {
 		win.close();
 	} );
 
-	// Auto-load most recent file on startup
-	if ( recentFiles.length > 0 ) {
-		win.webContents.on( "did-finish-load", () => {
-			openScriptFile( recentFiles[0] );
+	// --- LiveKit session IPC ---
+	ipcMain.on( "startLiveKitSession", async () => {
+		try {
+			const roomName = generateRoomName();
+			const identity = generateIdentity( "presenter" );
+			const credentials = await mintToken( { identity, roomName, role: "presenter" } );
+			setSession( { role: "presenter", roomName, startedAt: Date.now() } );
+			currentLastSession = { roomName, role: "presenter" };
+			win.webContents.send( "liveKitSessionStarted", credentials );
+		} catch ( err ) {
+			console.log( "startLiveKitSession error:", err );
+			win.webContents.send( "liveKitSessionError", { message: err.message } );
+		}
+	} );
+
+	ipcMain.on( "joinLiveKitSession", async ( _event, payload ) => {
+		try {
+			const roomName = ( ( payload && payload.roomName ) || "" ).trim();
+			if ( !roomName ) {
+				throw new Error( "Room name is required to join a session." );
+			}
+			const identity = generateIdentity( "viewer" );
+			const credentials = await mintToken( { identity, roomName, role: "viewer" } );
+			setSession( { role: "viewer", roomName, startedAt: Date.now() } );
+			currentLastSession = { roomName, role: "viewer" };
+			win.webContents.send( "liveKitSessionJoined", credentials );
+		} catch ( err ) {
+			console.log( "joinLiveKitSession error:", err );
+			win.webContents.send( "liveKitSessionError", { message: err.message } );
+		}
+	} );
+
+	ipcMain.on( "leaveLiveKitSession", () => {
+		clearSession();
+		win.webContents.send( "liveKitSessionLeft" );
+	} );
+
+	ipcMain.on( "leaveAndShowLauncher", () => {
+		clearSession();
+		showLauncher();
+		if ( teleprompterWin ) {
+			teleprompterWin.destroy();
+		}
+	} );
+
+	ipcMain.on( "copyToClipboard", ( _event, text ) => {
+		try {
+			clipboard.writeText( String( text ) );
+		} catch ( err ) {
+			console.log( "copyToClipboard error:", err );
+		}
+	} );
+
+	ipcMain.on( "getDeepgramKey", () => {
+		const session = getSession();
+		if ( !session || session.role !== "presenter" ) {
+			win.webContents.send( "deepgramKey", { key: null, error: "Deepgram key only available to presenter." } );
+			return;
+		}
+		const key = process.env.DEEPGRAM_API_KEY || null;
+		win.webContents.send( "deepgramKey", { key, error: key ? null : "DEEPGRAM_API_KEY not set in environment." } );
+	} );
+}
+
+app.whenReady().then( async () => {
+	const state = await stateManager.readAppState();
+	currentFontSize = state.fontSize || defaultConfig.fontSize;
+	currentOpacity = state.opacity ?? defaultConfig.opacity;
+	currentMirrored = state.mirrored || false;
+	recentFiles = state.recentFiles || [];
+	currentLastSession = state.lastSession || defaultConfig.lastSession;
+
+	ipcMain.on( "fontSize", ( _event, size ) => {
+		currentFontSize = size;
+	} );
+
+	ipcMain.on( "opacity", ( _event, value ) => {
+		currentOpacity = value;
+	} );
+
+	ipcMain.on( "mirrored", ( _event, value ) => {
+		currentMirrored = value;
+	} );
+
+	ipcMain.on( "launcherStart", async () => {
+		if ( !launcherWin ) return;
+		const result = await dialog.showOpenDialog( launcherWin, {
+			properties: [ "openFile" ],
+			filters: [
+				{ name: "Markdown", extensions: [ "md", "txt" ] },
+				{ name: "All Files", extensions: [ "*" ] }
+			]
 		} );
-	}
+		if ( result.canceled || !result.filePaths.length ) {
+			launcherWin?.webContents.send( "launcherResetButtons" );
+			return;
+		}
+		bootTeleprompter( state, { filePath: result.filePaths[0], startSession: true } );
+	} );
+
+	ipcMain.on( "launcherJoin", ( _event, payload ) => {
+		const roomName = ( ( payload && payload.roomName ) || "" ).trim();
+		if ( !roomName ) {
+			launcherWin?.webContents.send( "launcherResetButtons" );
+			return;
+		}
+		bootTeleprompter( state, { joinRoom: roomName } );
+	} );
+
+	showLauncher();
+} );
+
+app.on( "window-all-closed", () => {
+	app.quit();
 } );

@@ -2,7 +2,7 @@ import { defineConfig } from "eslint/config"; // eslint-disable-line n/no-unpubl
 import rg from "eslint-config-reverentgeek"; // eslint-disable-line n/no-unpublished-import
 
 export default defineConfig( [ {
-	ignores: [ "dist/", "src/client/editor-bundle.js" ]
+	ignores: [ "dist/", "src/client/editor-bundle.js", "src/client/livekit-bundle.js", "recipe/" ]
 }, {
 	extends: [ rg.configs["node-esm"] ],
 	rules: {
@@ -12,5 +12,8 @@ export default defineConfig( [ {
 	}
 }, {
 	files: [ "src/client/**/*.js", "src/client/**/*.mjs" ],
-	extends: [ rg.configs.browser ]
+	extends: [ rg.configs.browser ],
+	rules: {
+		"n/no-unsupported-features/node-builtins": "off"
+	}
 } ] );

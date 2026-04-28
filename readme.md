@@ -13,6 +13,7 @@ Desktop teleprompter app built with [Electron.js](https://www.electronjs.org/).
 - Recently opened files — File > Open Recent submenu
 - Auto-loads last opened file on startup
 - Window position and size are persisted across sessions
+- **Live session sharing** *(branch: `feat/live-session`)* — broadcast your script position to remote viewers in real time using LiveKit + Deepgram
 
 ## Usage
 
@@ -66,12 +67,47 @@ You can freely toggle between the editor and the teleprompter preview with `Cmd/
 | `Cmd/Ctrl+S`          | Save (in editor mode)         |
 | `Cmd/Ctrl+Shift+S`    | Save As (in editor mode)      |
 
+#### Shortcuts for live session sharing
+
+| Shortcut              | Action                        |
+| --------------------- | ----------------------------- |
+| `Cmd/Ctrl+Shift+L`    | Share session (host)          |
+| `Cmd/Ctrl+Shift+J`    | Join session (viewer)         |
+
+## Live Session Sharing (LiveKit + Deepgram)
+
+The `feat/live-session` branch adds remote session sharing. The presenter's app captures their microphone, streams audio to [Deepgram](https://deepgram.com/) for live speech-to-text, aligns the recognized words against the loaded script, and broadcasts the current script position over a [LiveKit](https://livekit.io/) data channel. Other instances of the app — running in *viewer mode* — connect to the same room, receive the script content + position updates, and smooth-scroll to follow the presenter (audio optional).
+
+**The aligner is forgiving:** ad-libs, repeated phrases, and skipped paragraphs are tolerated by sliding-window fuzzy matching against the script. The viewer's scroll position rewinds or jumps as needed.
+
+### Setup
+
+1. Sign up for [LiveKit Cloud](https://cloud.livekit.io/) (free tier works) and copy your project's URL, API key, and API secret.
+2. Sign up for [Deepgram](https://console.deepgram.com/) and copy an API key.
+3. Copy `.env.example` to `.env` at the repo root and fill in `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, and `DEEPGRAM_API_KEY`.
+
+### Hosting a session (presenter)
+
+1. Open a script as usual (File → Open).
+2. **Session → Share Session** (`Cmd/Ctrl+Shift+L`). The status badge in the top-right shows the auto-generated room name (`tp-xxxxxx`). Click it to copy the room name.
+3. Speak — the script scrolls along with you, and the position is broadcast to anyone who joins the room.
+
+### Joining a session (viewer)
+
+1. Launch a second instance of the app (`pnpm start` in another terminal).
+2. **Session → Join Session…** (`Cmd/Ctrl+Shift+J`). Paste the room name shared by the presenter.
+3. The script appears (delivered over the data channel), the viewer toolbar shows up, and the prompter scrolls in sync. Click **Unmute** to hear the presenter.
+
+### Recipe for LiveKit developers
+
+The `recipe/` directory contains a standalone, ~250-line example that demonstrates the same LiveKit + Deepgram observer pattern without the teleprompter UI — two HTML pages and a tiny Node token server. See [`recipe/README.md`](./recipe/README.md) for setup and a full walkthrough.
+
 ## Developer Setup
 
 1. Install [Node.js LTS](https://nodejs.org/) (v22+)
 1. Clone or download the source code.
-1. Open a terminal/command window, change to the source code folder, and install dependencies using `npm install`.
-1. Launch the app from the terminal using `npm start`.
+1. Open a terminal/command window, change to the source code folder, and install dependencies using `pnpm install` (or `npm install`).
+1. Launch the app from the terminal using `pnpm start`.
 
 ## Origin Story
 

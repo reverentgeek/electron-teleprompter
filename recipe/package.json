@@ -1,0 +1,18 @@
+{
+	"name": "livekit-deepgram-recipe",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Stream Deepgram transcripts over a LiveKit data channel — observer pattern recipe.",
+	"type": "module",
+	"main": "server.js",
+	"scripts": {
+		"start": "node server.js"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"dependencies": {
+		"dotenv": "^17.4.2",
+		"livekit-server-sdk": "^2.15.2"
+	}
+}

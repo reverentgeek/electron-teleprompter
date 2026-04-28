@@ -7,9 +7,11 @@
 	"type": "module",
 	"scripts": {
 		"build:editor": "esbuild src/client/editor.js --bundle --format=iife --global-name=EditorModule --outfile=src/client/editor-bundle.js",
-		"prestart": "pnpm build:editor",
+		"build:livekit": "esbuild src/client/livekit-client.js --bundle --format=iife --global-name=LiveKitModule --outfile=src/client/livekit-bundle.js",
+		"build:bundles": "pnpm build:editor && pnpm build:livekit",
+		"prestart": "pnpm build:bundles",
 		"start": "electron .",
-		"prebuild": "pnpm build:editor",
+		"prebuild": "pnpm build:bundles",
 		"build": "pnpm dlx @electron/packager --overwrite ./ --out ./dist --ignore=\"/node_modules/\\.ignored\" --ignore=\"/node_modules/(electron|@electron|eslint)\"",
 		"lint": "eslint --fix"
 	},
@@ -36,6 +38,9 @@
 	},
 	"dependencies": {
 		"chokidar": "^5.0.0",
+		"dotenv": "^17.4.2",
+		"livekit-client": "^2.18.7",
+		"livekit-server-sdk": "^2.15.2",
 		"showdown": "^2.1.0"
 	},
 	"packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8",

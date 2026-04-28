@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Presenter — LiveKit + Deepgram recipe</title>
+	<style>
+		body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2em auto; padding: 0 1em; color: #222; }
+		h1 { font-size: 1.4em; }
+		button { font-size: 1em; padding: 0.5em 1em; margin-right: 0.5em; }
+		.row { margin: 1em 0; }
+		.status { padding: 0.5em 0.75em; border-radius: 4px; background: #eef; margin-bottom: 1em; font-size: 0.9em; }
+		.status.live { background: #dfd; }
+		.status.error { background: #fdd; }
+		input[type="text"] { font-size: 1em; padding: 0.4em; width: 14em; }
+		#transcript { font-family: ui-monospace, monospace; background: #f6f6f6; padding: 0.75em; border-radius: 4px; min-height: 8em; white-space: pre-wrap; }
+		.muted { color: #777; }
+	</style>
+</head>
+<body>
+	<h1>Presenter</h1>
+	<p class="muted">Captures your microphone, streams audio to Deepgram, and broadcasts each final transcript over the LiveKit data channel.</p>
+
+	<div class="row">
+		<label>Room name: <input id="room" type="text" placeholder="auto-generated"></label>
+		<button id="start-btn" type="button">Start session</button>
+		<button id="stop-btn" type="button" disabled>Stop</button>
+	</div>
+
+	<div id="status" class="status">Not connected.</div>
+
+	<h2>Recent transcripts</h2>
+	<div id="transcript"></div>
+
+	<script type="module">
+		import { Room, RoomEvent, createLocalAudioTrack } from "https://cdn.skypack.dev/livekit-client@2";
+
+		const $ = ( id ) => document.getElementById( id );
+		const status = $( "status" );
+		const transcript = $( "transcript" );
+
+		const DEEPGRAM_QUERY = new URLSearchParams( {
+			model: "nova-3", smart_format: "true", interim_results: "false",
+			endpointing: "200", punctuate: "true", language: "en"
+		} ).toString();
+
+		let ctx = null;
+
+		function setStatus( text, variant ) {
+			status.textContent = text;
+			status.className = "status" + ( variant ? " " + variant : "" );
+		}
+
+		async function start() {
+			$( "start-btn" ).disabled = true;
+			try {
+				const roomName = $( "room" ).value.trim() || `recipe-${ Math.random().toString( 36 ).slice( 2, 7 ) }`;
+				$( "room" ).value = roomName;
+
+				// 1. Mint a LiveKit token and a short-lived Deepgram access token from the local server.
+				//    The Deepgram master API key stays on the server; the browser only sees a
+				//    ~30-second access token, scoped to opening the WebSocket.
+				const tokenRes = await fetch( `/api/token?room=${ encodeURIComponent( roomName ) }&role=presenter` ).then( r => r.json() );
+				if ( tokenRes.error ) throw new Error( tokenRes.error );
+				const dgRes = await fetch( "/api/deepgram-token" ).then( r => r.json() );
+				if ( dgRes.error ) throw new Error( dgRes.error );
+
+				// 2. Connect to the LiveKit room and publish the mic.
+				const room = new Room();
+				room.on( RoomEvent.Disconnected, () => setStatus( "Disconnected." ) );
+				await room.connect( tokenRes.url, tokenRes.token );
+				const audioTrack = await createLocalAudioTrack();
+				await room.localParticipant.publishTrack( audioTrack );
+
+				// 3. Open a Deepgram WebSocket using the short-lived access token (bearer scheme)
+				//    and pipe mic chunks into it.
+				const dgSocket = new WebSocket( `wss://api.deepgram.com/v1/listen?${ DEEPGRAM_QUERY }`, [ "bearer", dgRes.token ] );
+				await new Promise( ( resolve, reject ) => {
+					dgSocket.addEventListener( "open", resolve, { once: true } );
+					dgSocket.addEventListener( "error", reject, { once: true } );
+				} );
+
+				const recorder = new MediaRecorder( new MediaStream( [ audioTrack.mediaStreamTrack ] ),
+					{ mimeType: "audio/webm;codecs=opus" } );
+				recorder.ondataavailable = async ( e ) => {
+					if ( e.data.size && dgSocket.readyState === WebSocket.OPEN ) {
+						dgSocket.send( await e.data.arrayBuffer() );
+					}
+				};
+				recorder.start( 250 );
+
+				// 4. On each Deepgram final, broadcast the transcript over the LiveKit data channel.
+				const encoder = new TextEncoder();
+				dgSocket.addEventListener( "message", ( ev ) => {
+					const data = JSON.parse( ev.data );
+					if ( data.type !== "Results" || !data.is_final ) return;
+					const text = data.channel?.alternatives?.[0]?.transcript;
+					if ( !text ) return;
+					room.localParticipant.publishData(
+						encoder.encode( JSON.stringify( { type: "transcript", text, ts: Date.now() } ) ),
+						{ reliable: true }
+					);
+					transcript.textContent += ( transcript.textContent ? " " : "" ) + text;
+				} );
+
+				ctx = { room, audioTrack, recorder, dgSocket };
+				$( "stop-btn" ).disabled = false;
+				setStatus( `Live in room: ${ roomName }`, "live" );
+			} catch ( err ) {
+				console.error( err );
+				setStatus( `Error: ${ err.message }`, "error" );
+				$( "start-btn" ).disabled = false;
+			}
+		}
+
+		async function stop() {
+			if ( !ctx ) return;
+			try { ctx.recorder.stop(); } catch {}
+			try { ctx.dgSocket.send( JSON.stringify( { type: "CloseStream" } ) ); ctx.dgSocket.close(); } catch {}
+			try { ctx.audioTrack.stop(); } catch {}
+			try { await ctx.room.disconnect(); } catch {}
+			ctx = null;
+			$( "start-btn" ).disabled = false;
+			$( "stop-btn" ).disabled = true;
+			setStatus( "Stopped." );
+		}
+
+		$( "start-btn" ).addEventListener( "click", start );
+		$( "stop-btn" ).addEventListener( "click", stop );
+	</script>
+</body>
+</html>
