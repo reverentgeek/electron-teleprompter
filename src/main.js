@@ -18,7 +18,8 @@ const defaultConfig = {
 	mirrored: false,
 	recentFiles: [],
 	deepgramApiKey: null,
-	autoScrollSpeed: 1
+	autoScrollSpeed: 1,
+	audioDeviceId: null
 };
 
 const stateManager = stateFactory( defaultConfig );
@@ -30,6 +31,7 @@ let currentOpacity = defaultConfig.opacity;
 let currentMirrored = defaultConfig.mirrored;
 let currentDeepgramApiKey = null;
 let currentAutoScrollSpeed = defaultConfig.autoScrollSpeed;
+let currentAudioDeviceId = null;
 let recentFiles = [];
 let currentFilePath = null;
 let hasUnsavedChanges = false;
@@ -54,7 +56,8 @@ const saveState = async ( win ) => {
 		mirrored: currentMirrored,
 		recentFiles,
 		deepgramApiKey: currentDeepgramApiKey,
-		autoScrollSpeed: currentAutoScrollSpeed
+		autoScrollSpeed: currentAutoScrollSpeed,
+		audioDeviceId: currentAudioDeviceId
 	} );
 };
 
@@ -174,6 +177,7 @@ app.whenReady().then( async () => {
 	recentFiles = state.recentFiles || [];
 	currentDeepgramApiKey = state.deepgramApiKey || null;
 	currentAutoScrollSpeed = state.autoScrollSpeed ?? defaultConfig.autoScrollSpeed;
+	currentAudioDeviceId = state.audioDeviceId || null;
 
 	ipcMain.on( "fontSize", ( _event, size ) => {
 		currentFontSize = size;
@@ -299,6 +303,16 @@ app.whenReady().then( async () => {
 		currentDeepgramApiKey = trimmed || null;
 		await saveState( win );
 		win.webContents.send( "deepgramKeySaved", { hasKey: !!currentDeepgramApiKey } );
+	} );
+
+	ipcMain.on( "getAudioDeviceId", () => {
+		win.webContents.send( "audioDeviceId", { deviceId: currentAudioDeviceId } );
+	} );
+
+	ipcMain.on( "setAudioDeviceId", async ( _event, deviceId ) => {
+		const value = typeof deviceId === "string" && deviceId ? deviceId : null;
+		currentAudioDeviceId = value;
+		await saveState( win );
 	} );
 
 	// Auto-load most recent file on startup

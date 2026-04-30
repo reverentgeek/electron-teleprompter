@@ -30,7 +30,7 @@ export function isActive() {
 	return activeCtx !== null;
 }
 
-export async function startAutoScroll( { deepgramKey, scriptEl, onStatus, onScroll } ) {
+export async function startAutoScroll( { deepgramKey, scriptEl, onStatus, onScroll, audioDeviceId } ) {
 	if ( activeCtx ) {
 		throw new Error( "Auto-scroll already active." );
 	}
@@ -44,9 +44,33 @@ export async function startAutoScroll( { deepgramKey, scriptEl, onStatus, onScro
 	const wordIndex = buildWordIndex( scriptEl );
 	const aligner = createAligner( wordIndex.words );
 
-	const stream = await navigator.mediaDevices.getUserMedia( {
-		audio: { echoCancellation: true, noiseSuppression: true }
-	} );
+	const baseAudio = {
+		echoCancellation: true,
+		noiseSuppression: true
+	};
+	let stream;
+	let usedFallback = false;
+	if ( audioDeviceId ) {
+		try {
+			stream = await navigator.mediaDevices.getUserMedia( {
+				audio: { ...baseAudio, deviceId: { exact: audioDeviceId } }
+			} );
+		} catch ( err ) {
+			// Saved device is gone (unplugged, USB hub removed, etc) — fall back
+			// to the system default rather than failing the whole session.
+			if ( err.name === "OverconstrainedError" || err.name === "NotFoundError" ) {
+				usedFallback = true;
+				stream = await navigator.mediaDevices.getUserMedia( { audio: baseAudio } );
+			} else {
+				throw err;
+			}
+		}
+	} else {
+		stream = await navigator.mediaDevices.getUserMedia( { audio: baseAudio } );
+	}
+	if ( usedFallback ) {
+		onStatus?.( { type: "device-fallback", requestedDeviceId: audioDeviceId } );
+	}
 
 	const dgSocket = new WebSocket( DEEPGRAM_URL, [ "token", deepgramKey ] );
 

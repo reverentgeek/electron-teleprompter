@@ -107,7 +107,8 @@ a { color: #ffffffcc; }
 	color: #e0e0e0;
 }
 
-.modal-content input {
+.modal-content input,
+.modal-content select {
 	width: 100%;
 	box-sizing: border-box;
 	padding: 0.5em 0.75em;
@@ -120,7 +121,12 @@ a { color: #ffffffcc; }
 	outline: none;
 }
 
-.modal-content input:focus {
+.modal-content select {
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
 	border-color: #007bff;
 }
 

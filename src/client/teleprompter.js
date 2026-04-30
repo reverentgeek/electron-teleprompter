@@ -93,6 +93,11 @@ const apiKeyInput = document.getElementById( "api-key-input" );
 const apiKeySaveBtn = document.getElementById( "api-key-save" );
 const apiKeyCancelBtn = document.getElementById( "api-key-cancel" );
 const apiKeyClearBtn = document.getElementById( "api-key-clear" );
+const micModal = document.getElementById( "mic-modal" );
+const micSelect = document.getElementById( "mic-modal-select" );
+const micHint = document.getElementById( "mic-modal-hint" );
+const micSaveBtn = document.getElementById( "mic-modal-save" );
+const micCancelBtn = document.getElementById( "mic-modal-cancel" );
 
 // --- Auto-scroll state ---
 let autoScrollActive = false;
@@ -101,6 +106,7 @@ let pendingDeepgramKey = null;
 let pendingStartAfterKeySave = false;
 let lastManualScrollTs = 0;
 let autoScrollSpeed = SCROLL_SPEED_DEFAULT;
+let audioDeviceId = null;
 let speedHintTimer = null;
 const MANUAL_SCROLL_GRACE_MS = 3000;
 const SPEED_HINT_MS = 1500;
@@ -489,9 +495,12 @@ async function tryStartFlow() {
 		await startAutoScroll( {
 			deepgramKey: dgKey.key,
 			scriptEl: md,
+			audioDeviceId,
 			onStatus: ( status ) => {
 				if ( status.type === "closed" || status.type === "error" ) {
 					if ( autoScrollActive ) stopAutoScrollSession();
+				} else if ( status.type === "device-fallback" ) {
+					showTransientHint( "Saved mic unavailable — using default", 2500 );
 				}
 			},
 			onScroll: handleAutoScrollPosition
@@ -615,9 +624,8 @@ function applyAutoScrollSpeed( value, save = true ) {
 	}
 }
 
-function showSpeedHint() {
+function showTransientHint( text, durationMs ) {
 	if ( !autoScrollIndicator ) return;
-	const text = `Speed ${ autoScrollSpeed.toFixed( 2 ).replace( /\.?0+$/, "" ) }×`;
 	autoScrollIndicator.textContent = text;
 	autoScrollIndicator.classList.remove( "hidden", "connecting", "error" );
 	if ( speedHintTimer ) clearTimeout( speedHintTimer );
@@ -630,7 +638,12 @@ function showSpeedHint() {
 		} else {
 			setIndicator( null );
 		}
-	}, SPEED_HINT_MS );
+	}, durationMs );
+}
+
+function showSpeedHint() {
+	const text = `Speed ${ autoScrollSpeed.toFixed( 2 ).replace( /\.?0+$/, "" ) }×`;
+	showTransientHint( text, SPEED_HINT_MS );
 }
 
 function adjustAutoScrollSpeed( action ) {
@@ -651,3 +664,92 @@ window.electron.onAutoScrollSpeed( ( value ) => {
 } );
 
 window.electron.onMenuAdjustAutoScrollSpeed( adjustAutoScrollSpeed );
+
+// --- Microphone selection ---
+
+async function populateMicSelect() {
+	if ( !micSelect ) return;
+	let devices = [];
+	try {
+		devices = await navigator.mediaDevices.enumerateDevices();
+	} catch ( err ) {
+		console.warn( "[mic] enumerateDevices failed", err );
+	}
+	const inputs = devices.filter( d => d.kind === "audioinput" );
+	micSelect.innerHTML = "";
+
+	const defaultOpt = document.createElement( "option" );
+	defaultOpt.value = "";
+	defaultOpt.textContent = "System default";
+	micSelect.appendChild( defaultOpt );
+
+	let hasLabels = false;
+	let matchedSelection = false;
+	for ( const d of inputs ) {
+		const opt = document.createElement( "option" );
+		opt.value = d.deviceId;
+		opt.textContent = d.label || `Microphone (${ d.deviceId.slice( 0, 6 ) }…)`;
+		if ( d.label ) hasLabels = true;
+		if ( d.deviceId === audioDeviceId ) {
+			opt.selected = true;
+			matchedSelection = true;
+		}
+		micSelect.appendChild( opt );
+	}
+	if ( !matchedSelection ) {
+		defaultOpt.selected = true;
+	}
+
+	if ( inputs.length === 0 ) {
+		micHint.textContent = "No microphones detected.";
+	} else if ( !hasLabels ) {
+		micHint.textContent = "Start auto-scroll once and grant mic access to see device names.";
+	} else {
+		micHint.textContent = "Used by auto-scroll for speech recognition. Takes effect next time auto-scroll starts.";
+	}
+}
+
+function showMicModal() {
+	if ( !micModal ) return;
+	populateMicSelect();
+	micModal.classList.remove( "hidden" );
+	setTimeout( () => micSelect?.focus(), 0 );
+}
+
+function hideMicModal() {
+	micModal?.classList.add( "hidden" );
+}
+
+if ( micSaveBtn ) {
+	micSaveBtn.addEventListener( "click", () => {
+		const value = micSelect.value || "";
+		audioDeviceId = value || null;
+		window.electron.setAudioDeviceId( value );
+		hideMicModal();
+	} );
+}
+
+if ( micCancelBtn ) {
+	micCancelBtn.addEventListener( "click", hideMicModal );
+}
+
+if ( micSelect ) {
+	micSelect.addEventListener( "keydown", ( e ) => {
+		if ( e.key === "Enter" ) micSaveBtn?.click();
+		else if ( e.key === "Escape" ) hideMicModal();
+	} );
+}
+
+if ( navigator.mediaDevices?.addEventListener ) {
+	navigator.mediaDevices.addEventListener( "devicechange", () => {
+		if ( micModal && !micModal.classList.contains( "hidden" ) ) {
+			populateMicSelect();
+		}
+	} );
+}
+
+window.electron.onMenuSelectMicrophone( showMicModal );
+window.electron.onAudioDeviceId( ( payload ) => {
+	audioDeviceId = payload?.deviceId || null;
+} );
+window.electron.getAudioDeviceId();

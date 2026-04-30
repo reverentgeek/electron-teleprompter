@@ -37,5 +37,9 @@ contextBridge.exposeInMainWorld( "electron", {
 	onDeepgramKeySaved: callback => ipcRenderer.on( "deepgramKeySaved", ( _event, payload ) => callback( payload ) ),
 	onToggleAutoScroll: callback => ipcRenderer.on( "toggleAutoScroll", () => callback() ),
 	onMenuSetDeepgramKey: callback => ipcRenderer.on( "menuSetDeepgramKey", () => callback() ),
-	onMenuAdjustAutoScrollSpeed: callback => ipcRenderer.on( "menuAdjustAutoScrollSpeed", ( _event, action ) => callback( action ) )
+	onMenuAdjustAutoScrollSpeed: callback => ipcRenderer.on( "menuAdjustAutoScrollSpeed", ( _event, action ) => callback( action ) ),
+	getAudioDeviceId: () => ipcRenderer.send( "getAudioDeviceId" ),
+	setAudioDeviceId: deviceId => ipcRenderer.send( "setAudioDeviceId", deviceId ),
+	onAudioDeviceId: callback => ipcRenderer.on( "audioDeviceId", ( _event, payload ) => callback( payload ) ),
+	onMenuSelectMicrophone: callback => ipcRenderer.on( "menuSelectMicrophone", () => callback() )
 } );

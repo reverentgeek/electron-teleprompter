@@ -118,6 +118,12 @@ export function buildMenus( browserWindow, openScriptFile, recentFiles ) {
 			},
 			{ type: "separator" },
 			{
+				label: "Select Microphone…",
+				click: () => {
+					browserWindow.webContents.send( "menuSelectMicrophone" );
+				}
+			},
+			{
 				label: "Set Deepgram API Key…",
 				click: () => {
 					browserWindow.webContents.send( "menuSetDeepgramKey" );
