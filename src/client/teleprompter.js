@@ -1,3 +1,15 @@
+import {
+	startAutoScroll,
+	stopAutoScroll,
+	scrollToWord,
+	cancelScroll,
+	setScrollSpeed,
+	SCROLL_SPEED_MIN,
+	SCROLL_SPEED_MAX,
+	SCROLL_SPEED_DEFAULT,
+	SCROLL_SPEED_STEP
+} from "./auto-scroll.js";
+
 let scriptIndex = 0;
 const md = document.getElementById( "md" );
 
@@ -75,6 +87,23 @@ const btnSave = document.getElementById( "btn-save" );
 const btnSaveAs = document.getElementById( "btn-save-as" );
 const btnCancel = document.getElementById( "btn-cancel" );
 const resizeHandle = document.getElementById( "resize-handle" );
+const autoScrollIndicator = document.getElementById( "auto-scroll-indicator" );
+const apiKeyModal = document.getElementById( "api-key-modal" );
+const apiKeyInput = document.getElementById( "api-key-input" );
+const apiKeySaveBtn = document.getElementById( "api-key-save" );
+const apiKeyCancelBtn = document.getElementById( "api-key-cancel" );
+const apiKeyClearBtn = document.getElementById( "api-key-clear" );
+
+// --- Auto-scroll state ---
+let autoScrollActive = false;
+let autoScrollStarting = false;
+let pendingDeepgramKey = null;
+let pendingStartAfterKeySave = false;
+let lastManualScrollTs = 0;
+let autoScrollSpeed = SCROLL_SPEED_DEFAULT;
+let speedHintTimer = null;
+const MANUAL_SCROLL_GRACE_MS = 3000;
+const SPEED_HINT_MS = 1500;
 
 // Track manual scrolling in preview mode
 let ignoreNextScroll = false;
@@ -88,6 +117,19 @@ window.addEventListener( "scroll", () => {
 		previewManuallyScrolled = true;
 	}
 } );
+
+function noteManualScroll() {
+	if ( autoScrollActive ) {
+		lastManualScrollTs = Date.now();
+		cancelScroll();
+	}
+}
+window.addEventListener( "wheel", noteManualScroll, { passive: true } );
+window.addEventListener( "mousedown", noteManualScroll );
+const SCROLL_KEYS = new Set( [ "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End", " " ] );
+document.addEventListener( "keydown", ( e ) => {
+	if ( SCROLL_KEYS.has( e.key ) ) noteManualScroll();
+}, true );
 
 function scrollPreviewToCursorLine() {
 	if ( !editorView || !md ) return;
@@ -130,6 +172,9 @@ function showPreview() {
 
 function enterEditMode() {
 	if ( isEditMode ) return;
+	if ( autoScrollActive || autoScrollStarting ) {
+		stopAutoScrollSession();
+	}
 	savedScrollY = window.scrollY;
 	isEditMode = true;
 
@@ -189,6 +234,9 @@ function toggleEditMode() {
 		}
 		showPreview();
 	} else if ( editorView ) {
+		if ( autoScrollActive || autoScrollStarting ) {
+			stopAutoScrollSession();
+		}
 		// Save preview scroll position before switching to editor
 		savedScrollY = window.scrollY;
 		// Resume editing — just swap visibility back
@@ -387,4 +435,219 @@ window.electron.onContent( ( content ) => {
 	if ( isEditMode && !isSaving ) {
 		window.electron.requestRawMarkdown();
 	}
+	// Reloaded HTML invalidates the word index; stop auto-scroll if active.
+	if ( autoScrollActive ) {
+		stopAutoScrollSession();
+	}
 } );
+
+// --- Auto-scroll toggle ---
+
+function setIndicator( text, variant ) {
+	if ( !autoScrollIndicator ) return;
+	if ( !text ) {
+		autoScrollIndicator.classList.add( "hidden" );
+		autoScrollIndicator.textContent = "";
+		return;
+	}
+	autoScrollIndicator.textContent = text;
+	autoScrollIndicator.classList.remove( "hidden", "connecting", "error" );
+	if ( variant ) autoScrollIndicator.classList.add( variant );
+}
+
+function handleAutoScrollPosition( wordIdx, ranges ) {
+	if ( Date.now() - lastManualScrollTs < MANUAL_SCROLL_GRACE_MS ) return;
+	scrollToWord( wordIdx, ranges );
+}
+
+async function startAutoScrollSession() {
+	if ( autoScrollActive || autoScrollStarting ) return;
+	if ( isEditMode ) {
+		alert( "Exit the editor before starting auto-scroll." );
+		return;
+	}
+	autoScrollStarting = true;
+	pendingDeepgramKey = null;
+	setIndicator( "Connecting…", "connecting" );
+	window.electron.getDeepgramKey();
+}
+
+async function tryStartFlow() {
+	if ( !autoScrollStarting || !pendingDeepgramKey ) return;
+	const dgKey = pendingDeepgramKey;
+	pendingDeepgramKey = null;
+
+	if ( !dgKey.key ) {
+		autoScrollStarting = false;
+		setIndicator( null );
+		pendingStartAfterKeySave = true;
+		showApiKeyModal();
+		return;
+	}
+
+	try {
+		await startAutoScroll( {
+			deepgramKey: dgKey.key,
+			scriptEl: md,
+			onStatus: ( status ) => {
+				if ( status.type === "closed" || status.type === "error" ) {
+					if ( autoScrollActive ) stopAutoScrollSession();
+				}
+			},
+			onScroll: handleAutoScrollPosition
+		} );
+		autoScrollActive = true;
+		autoScrollStarting = false;
+		lastManualScrollTs = 0;
+		setIndicator( "Listening" );
+	} catch ( err ) {
+		autoScrollStarting = false;
+		console.error( "[auto-scroll] start failed", err );
+		setIndicator( "Error", "error" );
+		setTimeout( () => {
+			if ( !autoScrollActive ) setIndicator( null );
+		}, 3000 );
+		alert( `Failed to start auto-scroll: ${ err.message }` );
+	}
+}
+
+async function stopAutoScrollSession() {
+	if ( !autoScrollActive && !autoScrollStarting ) return;
+	autoScrollActive = false;
+	autoScrollStarting = false;
+	setIndicator( null );
+	try {
+		await stopAutoScroll();
+	} catch ( err ) {
+		console.warn( "[auto-scroll] stop error", err );
+	}
+}
+
+function toggleAutoScrollSession() {
+	if ( autoScrollActive || autoScrollStarting ) {
+		stopAutoScrollSession();
+	} else {
+		startAutoScrollSession();
+	}
+}
+
+if ( autoScrollIndicator ) {
+	autoScrollIndicator.addEventListener( "click", () => {
+		stopAutoScrollSession();
+	} );
+}
+
+window.electron.onToggleAutoScroll( toggleAutoScrollSession );
+window.electron.onDeepgramKey( ( payload ) => {
+	pendingDeepgramKey = payload;
+	tryStartFlow();
+} );
+
+// --- API key modal ---
+
+function showApiKeyModal() {
+	if ( !apiKeyModal ) return;
+	apiKeyInput.value = "";
+	apiKeyModal.classList.remove( "hidden" );
+	setTimeout( () => apiKeyInput.focus(), 0 );
+}
+
+function hideApiKeyModal() {
+	if ( !apiKeyModal ) return;
+	apiKeyModal.classList.add( "hidden" );
+	apiKeyInput.value = "";
+}
+
+if ( apiKeySaveBtn ) {
+	apiKeySaveBtn.addEventListener( "click", () => {
+		const value = apiKeyInput.value.trim();
+		if ( !value ) return;
+		window.electron.setDeepgramKey( value );
+		hideApiKeyModal();
+	} );
+}
+
+if ( apiKeyCancelBtn ) {
+	apiKeyCancelBtn.addEventListener( "click", () => {
+		pendingStartAfterKeySave = false;
+		hideApiKeyModal();
+	} );
+}
+
+if ( apiKeyClearBtn ) {
+	apiKeyClearBtn.addEventListener( "click", () => {
+		pendingStartAfterKeySave = false;
+		window.electron.setDeepgramKey( "" );
+		hideApiKeyModal();
+	} );
+}
+
+if ( apiKeyInput ) {
+	apiKeyInput.addEventListener( "keydown", ( e ) => {
+		if ( e.key === "Enter" ) {
+			apiKeySaveBtn?.click();
+		} else if ( e.key === "Escape" ) {
+			apiKeyCancelBtn?.click();
+		}
+	} );
+}
+
+window.electron.onMenuSetDeepgramKey( () => {
+	pendingStartAfterKeySave = false;
+	showApiKeyModal();
+} );
+
+window.electron.onDeepgramKeySaved( ( payload ) => {
+	if ( pendingStartAfterKeySave && payload.hasKey ) {
+		pendingStartAfterKeySave = false;
+		startAutoScrollSession();
+	}
+} );
+
+// --- Auto-scroll speed control ---
+
+function applyAutoScrollSpeed( value, save = true ) {
+	const clamped = Math.max( SCROLL_SPEED_MIN, Math.min( SCROLL_SPEED_MAX, value ) );
+	autoScrollSpeed = Math.round( clamped * 100 ) / 100;
+	setScrollSpeed( autoScrollSpeed );
+	if ( save ) {
+		window.electron.saveAutoScrollSpeed( autoScrollSpeed );
+	}
+}
+
+function showSpeedHint() {
+	if ( !autoScrollIndicator ) return;
+	const text = `Speed ${ autoScrollSpeed.toFixed( 2 ).replace( /\.?0+$/, "" ) }×`;
+	autoScrollIndicator.textContent = text;
+	autoScrollIndicator.classList.remove( "hidden", "connecting", "error" );
+	if ( speedHintTimer ) clearTimeout( speedHintTimer );
+	speedHintTimer = setTimeout( () => {
+		speedHintTimer = null;
+		if ( autoScrollActive ) {
+			setIndicator( "Listening" );
+		} else if ( autoScrollStarting ) {
+			setIndicator( "Connecting…", "connecting" );
+		} else {
+			setIndicator( null );
+		}
+	}, SPEED_HINT_MS );
+}
+
+function adjustAutoScrollSpeed( action ) {
+	if ( action === "up" ) {
+		applyAutoScrollSpeed( autoScrollSpeed + SCROLL_SPEED_STEP );
+	} else if ( action === "down" ) {
+		applyAutoScrollSpeed( autoScrollSpeed - SCROLL_SPEED_STEP );
+	} else if ( action === "reset" ) {
+		applyAutoScrollSpeed( SCROLL_SPEED_DEFAULT );
+	} else {
+		return;
+	}
+	showSpeedHint();
+}
+
+window.electron.onAutoScrollSpeed( ( value ) => {
+	applyAutoScrollSpeed( value, false );
+} );
+
+window.electron.onMenuAdjustAutoScrollSpeed( adjustAutoScrollSpeed );

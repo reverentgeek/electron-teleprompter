@@ -86,6 +86,44 @@ export function buildMenus( browserWindow, openScriptFile, recentFiles ) {
 			{ role: "paste" },
 			{ role: "selectAll" }
 		] },
+		{ label: "Script", submenu: [
+			{
+				label: "Toggle Auto-scroll",
+				accelerator: "CmdOrCtrl+Shift+L",
+				click: () => {
+					browserWindow.webContents.send( "toggleAutoScroll" );
+				}
+			},
+			{ type: "separator" },
+			{
+				label: "Increase Auto-scroll Speed",
+				accelerator: "CmdOrCtrl+]",
+				click: () => {
+					browserWindow.webContents.send( "menuAdjustAutoScrollSpeed", "up" );
+				}
+			},
+			{
+				label: "Decrease Auto-scroll Speed",
+				accelerator: "CmdOrCtrl+[",
+				click: () => {
+					browserWindow.webContents.send( "menuAdjustAutoScrollSpeed", "down" );
+				}
+			},
+			{
+				label: "Reset Auto-scroll Speed",
+				accelerator: "CmdOrCtrl+\\",
+				click: () => {
+					browserWindow.webContents.send( "menuAdjustAutoScrollSpeed", "reset" );
+				}
+			},
+			{ type: "separator" },
+			{
+				label: "Set Deepgram API Key…",
+				click: () => {
+					browserWindow.webContents.send( "menuSetDeepgramKey" );
+				}
+			}
+		] },
 		{ role: "viewMenu" }
 	];
 

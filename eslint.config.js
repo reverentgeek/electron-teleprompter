@@ -12,5 +12,8 @@ export default defineConfig( [ {
 	}
 }, {
 	files: [ "src/client/**/*.js", "src/client/**/*.mjs" ],
-	extends: [ rg.configs.browser ]
+	extends: [ rg.configs.browser ],
+	rules: {
+		"n/no-unsupported-features/node-builtins": "off"
+	}
 } ] );

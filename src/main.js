@@ -16,7 +16,9 @@ const defaultConfig = {
 	fontSize: 3,
 	opacity: 0.07,
 	mirrored: false,
-	recentFiles: []
+	recentFiles: [],
+	deepgramApiKey: null,
+	autoScrollSpeed: 1
 };
 
 const stateManager = stateFactory( defaultConfig );
@@ -26,6 +28,8 @@ let watcherPaused = false;
 let currentFontSize = defaultConfig.fontSize;
 let currentOpacity = defaultConfig.opacity;
 let currentMirrored = defaultConfig.mirrored;
+let currentDeepgramApiKey = null;
+let currentAutoScrollSpeed = defaultConfig.autoScrollSpeed;
 let recentFiles = [];
 let currentFilePath = null;
 let hasUnsavedChanges = false;
@@ -48,7 +52,9 @@ const saveState = async ( win ) => {
 		fontSize: currentFontSize,
 		opacity: currentOpacity,
 		mirrored: currentMirrored,
-		recentFiles
+		recentFiles,
+		deepgramApiKey: currentDeepgramApiKey,
+		autoScrollSpeed: currentAutoScrollSpeed
 	} );
 };
 
@@ -67,12 +73,17 @@ const createWindow = ( state ) => {
 		frame: false
 	} );
 
+	win.webContents.session.setPermissionRequestHandler( ( _wc, permission, callback ) => {
+		callback( permission === "media" );
+	} );
+
 	win.loadFile( path.join( __dirname, "client", "teleprompter.html" ) );
 
 	win.webContents.on( "did-finish-load", () => {
 		win.webContents.send( "fontSize", state.fontSize || defaultConfig.fontSize );
 		win.webContents.send( "opacity", state.opacity ?? defaultConfig.opacity );
 		win.webContents.send( "mirrored", state.mirrored || false );
+		win.webContents.send( "autoScrollSpeed", state.autoScrollSpeed ?? defaultConfig.autoScrollSpeed );
 	} );
 
 	win.on( "close", async ( event ) => {
@@ -161,6 +172,8 @@ app.whenReady().then( async () => {
 	currentOpacity = state.opacity ?? defaultConfig.opacity;
 	currentMirrored = state.mirrored || false;
 	recentFiles = state.recentFiles || [];
+	currentDeepgramApiKey = state.deepgramApiKey || null;
+	currentAutoScrollSpeed = state.autoScrollSpeed ?? defaultConfig.autoScrollSpeed;
 
 	ipcMain.on( "fontSize", ( _event, size ) => {
 		currentFontSize = size;
@@ -172,6 +185,12 @@ app.whenReady().then( async () => {
 
 	ipcMain.on( "mirrored", ( _event, value ) => {
 		currentMirrored = value;
+	} );
+
+	ipcMain.on( "autoScrollSpeed", ( _event, value ) => {
+		if ( Number.isFinite( value ) ) {
+			currentAutoScrollSpeed = value;
+		}
 	} );
 
 	const { win, openScriptFile } = createWindow( state );
@@ -266,6 +285,20 @@ app.whenReady().then( async () => {
 		isClosing = true;
 		await saveState( win );
 		win.close();
+	} );
+
+	ipcMain.on( "getDeepgramKey", () => {
+		win.webContents.send( "deepgramKey", {
+			key: currentDeepgramApiKey,
+			error: currentDeepgramApiKey ? null : "No Deepgram API key saved."
+		} );
+	} );
+
+	ipcMain.on( "setDeepgramKey", async ( _event, key ) => {
+		const trimmed = typeof key === "string" ? key.trim() : "";
+		currentDeepgramApiKey = trimmed || null;
+		await saveState( win );
+		win.webContents.send( "deepgramKeySaved", { hasKey: !!currentDeepgramApiKey } );
 	} );
 
 	// Auto-load most recent file on startup

@@ -4,8 +4,8 @@
 <head>
 	<meta charset="UTF-8">
 	<!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
-	<meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://api.deepgram.com; media-src 'self' blob:">
+	<meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://api.deepgram.com; media-src 'self' blob:">
 	<title>Electron Teleprompter</title>
 	<link rel="stylesheet" type="text/css" href="teleprompter.css">
 	<link rel="stylesheet" type="text/css" href="editor.css">
@@ -40,6 +40,19 @@
 			<button id="btn-cancel">Cancel</button>
 		</div>
 		<div id="editor"></div>
+	</div>
+	<div id="auto-scroll-indicator" class="hidden" title="Click to stop auto-scroll"></div>
+	<div id="api-key-modal" class="modal hidden">
+		<div class="modal-content">
+			<h3>Deepgram API Key</h3>
+			<p>Required for the auto-scroll feature. Get one at <span class="modal-hint">console.deepgram.com</span>. Stored locally in app state.</p>
+			<input id="api-key-input" type="password" placeholder="dg_..." autocomplete="off" spellcheck="false">
+			<div class="modal-actions">
+				<button id="api-key-clear" type="button">Clear</button>
+				<button id="api-key-cancel" type="button">Cancel</button>
+				<button id="api-key-save" type="button" class="primary">Save</button>
+			</div>
+		</div>
 	</div>
 	<div id="resize-handle"></div>
 	<script src="./editor-bundle.js"></script>
