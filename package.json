@@ -29,16 +29,16 @@
 		"@codemirror/theme-one-dark": "^6.1.3",
 		"@electron/packager": "^20.0.0",
 		"codemirror": "^6.0.2",
-		"electron": "^41.3.0",
+		"electron": "^41.5.0",
 		"esbuild": "^0.28.0",
-		"eslint": "^10.2.1",
-		"eslint-config-reverentgeek": "^7.1.4"
+		"eslint": "^10.3.0",
+		"eslint-config-reverentgeek": "^7.1.5"
 	},
 	"dependencies": {
 		"chokidar": "^5.0.0",
 		"showdown": "^2.1.0"
 	},
-	"packageManager": "pnpm@11.0.3+sha512.10448f2988933787c6699aef683174c741f6472ad91b7e3c8fe3e2bda57be8a0f7caf58949b8bc22e624578b3dc6e57876ba4c631928a1b84cc141e12c79bccd",
+	"packageManager": "pnpm@11.0.4+sha512.0a397165007a014ed52919a61e5f46c48b9bca88404c303ecaecc63f62def563898d3c6b8a5d5ea5811eb398cfe03ab05da1a5ce963f126d5ead4c02f93b83c3",
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"electron",
