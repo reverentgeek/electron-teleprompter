@@ -2,6 +2,6 @@ allowBuilds:
   electron: true
   esbuild: true
 minimumReleaseAgeExclude:
-  - eslint-config-reverentgeek@7.1.8
+  - eslint-config-reverentgeek
 onlyBuiltDependencies:
   - electron
