@@ -6,7 +6,7 @@ import stateFactory from "./utils/state.js";
 import { convertMarkdown, readAndConvertMarkdown, readRawMarkdown } from "./utils/content.js";
 import { buildMenus } from "./menus.js";
 
-const __dirname = import.meta.dirname;
+const __dirname = import.meta.dirname; // eslint-disable-line n/no-unsupported-features/node-builtins
 
 const MAX_RECENT_FILES = 10;
 

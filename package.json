@@ -31,8 +31,8 @@
 		"codemirror": "^6.0.2",
 		"electron": "^42.5.0",
 		"esbuild": "^0.28.1",
-		"eslint": "^10.5.0",
-		"eslint-config-reverentgeek": "^7.1.10"
+		"eslint": "^10.6.0",
+		"eslint-config-reverentgeek": "^7.1.12"
 	},
 	"dependencies": {
 		"chokidar": "^5.0.0",

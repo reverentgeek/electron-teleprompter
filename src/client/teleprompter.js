@@ -349,7 +349,7 @@ document.addEventListener( "keydown", ( event ) => {
 	// Suppress teleprompter shortcuts when in edit mode
 	if ( isEditMode ) return;
 
-	if ( event.key === "ArrowDown" || event.key === "ArrowUp" ) {
+	if ( ( event.key === "ArrowDown" || event.key === "ArrowUp" ) && !( ( event.metaKey || event.ctrlKey ) && event.shiftKey ) ) {
 		// Allow default scroll behavior, but track it
 		previewManuallyScrolled = true;
 	} else if ( event.key === "ArrowRight" ) {

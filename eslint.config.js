@@ -7,7 +7,16 @@ export default defineConfig( [ {
 	extends: [ rg.configs["node-esm"] ],
 	rules: {
 		"n/no-unpublished-import": [ "error", {
-			allowModules: [ "electron" ]
+			// codemirror packages are bundled into editor-bundle.js by esbuild,
+			// so they're devDependencies rather than runtime dependencies
+			allowModules: [
+				"electron",
+				"codemirror",
+				"@codemirror/lang-markdown",
+				"@codemirror/language-data",
+				"@codemirror/theme-one-dark",
+				"@codemirror/state"
+			]
 		} ]
 	}
 }, {
