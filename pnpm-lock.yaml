@@ -28,8 +28,8 @@ importers:
         specifier: ^6.1.3
         version: 6.1.3
       '@electron/packager':
-        specifier: ^20.0.1
-        version: 20.0.1
+        specifier: ^20.0.2
+        version: 20.0.2
       codemirror:
         specifier: ^6.0.2
         version: 6.0.2
@@ -138,8 +138,8 @@ packages:
   '@codemirror/theme-one-dark@6.1.3':
     resolution: {integrity: sha512-NzBdIvEJmx6fjeremiGp3t/okrLPYT0d9orIc7AFun8oZcRk58aejkqhv6spnz4MLAevrKNPMQYXEWMg4s+sKA==}
 
-  '@codemirror/view@6.43.4':
-    resolution: {integrity: sha512-YImu23iyKfncJzT7sRy+rEqEhSc8RhOHqDxwy4WzXRKJwYm6iwf/9OJk5ctCAdZ6yi2ZqaGEvmf55fSVqMDrgg==}
+  '@codemirror/view@6.43.5':
+    resolution: {integrity: sha512-7uT/vUgH6dfXWn3WqOe23KneILMvGy5wQjNMEcRXLKzziJ9NOktpW6tGoyQpwVkBgE5Gj6hKkCcsddbnkaWrOQ==}
 
   '@electron-internal/extract-zip@1.0.4':
     resolution: {integrity: sha512-Zr1Vs7E9tpCNhZHDAbFVXc2gEVCG9RqPDjrno5+bdgB6LRAuvgyMHJut4NCVyYwtAieapMzc3fiQ3CSTi75ARg==}
@@ -158,22 +158,22 @@ packages:
     resolution: {integrity: sha512-uQQSlOiJnqRkTL1wlEBAxe90nVN/Fc/hEmk0bqpKk8nKjV1if/tXLHKUPePtv9Xsx90PtZU8aidx5lAiOpjkQQ==}
     engines: {node: '>= 22.12.0'}
 
-  '@electron/osx-sign@2.4.2':
-    resolution: {integrity: sha512-63Oi+mXbgtbQsU3eLam3qYISAwxAHllDabGNxW5snISFte/QvEKhPsPDNLGNegdlbNV59AGNRYN45VUOcnCVOg==}
+  '@electron/osx-sign@2.5.0':
+    resolution: {integrity: sha512-o4+Yq1WQGO+ewJJ0sL0ofWCo5rEZ1omLX7X8Q22rEotQzhZbwcWuXXBOu4/5xrWzyBALNCPAxDkY3Dfo5536Lg==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
-  '@electron/packager@20.0.1':
-    resolution: {integrity: sha512-Fz45favukZRRPCXU49hbi/15GFFlxYWtlbH7AXLY1A9tQw15c8hKhs26d431sbUvKrFicuKLpYnKaOGNPoOfjw==}
+  '@electron/packager@20.0.2':
+    resolution: {integrity: sha512-+JK2Fb1+PwJseK5yaeW3XCFGhe+yPXtRWJeFZN4l8Cq2rLv6zS4PMus/khbcNj5l5Git9w8hffFg7jkJGbbUtg==}
     engines: {node: '>= 22.12.0'}
     hasBin: true
 
-  '@electron/universal@3.0.5':
-    resolution: {integrity: sha512-LCGZyQOW2ZCAOQPCVIXv8QxxGNdsAOArgOEFivjgA3T+qqG96qKPTfcFEK7FTtLINxpkx0kmcSwliU9k1XWN2g==}
+  '@electron/universal@3.0.6':
+    resolution: {integrity: sha512-MonS1kfkZdSEkLZI0pdR/TCx8ecxwRSFm7sORfwIkDI9UaIbHnk4Mgeqq+Ob9qDQRV8LZ9+hHCmimpA9BRcNxw==}
     engines: {node: '>=22.12.0'}
 
-  '@electron/windows-sign@2.0.5':
-    resolution: {integrity: sha512-GFW/TAFuo5UmUWxJS+zsYHtZA7StzIfQcEF3pmlN9PpqMwUHPfYnUpZT1C5i1W3mrY7jQeax8kDCLJERjVf19w==}
+  '@electron/windows-sign@2.0.6':
+    resolution: {integrity: sha512-ESWgNkFsXFH06I5EB2uHv3hmZA3yF4j9GTB77W74x3b5KZNItxggNzuADw41HUy6mhnC2K+E2mT0Xgc4YKu3IQ==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
@@ -798,8 +798,8 @@ packages:
     resolution: {integrity: sha512-nh39Mo1eGWmZS7y+mK/dQIqg7S1lp38DpRxkyoHf0ZcUs/HDc+yyTjuOtTvSMZHmfSLuSQaX945u05Y2Q6UWZg==}
     engines: {node: '>=14', npm: '>=7'}
 
-  picomatch@4.0.4:
-    resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
+  picomatch@4.0.5:
+    resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
 
   plist@3.1.1:
@@ -914,14 +914,14 @@ snapshots:
     dependencies:
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
 
   '@codemirror/commands@6.10.4':
     dependencies:
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
 
   '@codemirror/lang-angular@0.1.4':
@@ -961,7 +961,7 @@ snapshots:
       '@codemirror/lang-javascript': 6.2.5
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
       '@lezer/css': 1.3.4
       '@lezer/html': 1.3.13
@@ -977,7 +977,7 @@ snapshots:
       '@codemirror/language': 6.12.4
       '@codemirror/lint': 6.9.7
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
       '@lezer/javascript': 1.5.4
 
@@ -987,7 +987,7 @@ snapshots:
       '@codemirror/lang-html': 6.4.11
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.10
@@ -1011,7 +1011,7 @@ snapshots:
       '@codemirror/lang-html': 6.4.11
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.10
@@ -1022,7 +1022,7 @@ snapshots:
       '@codemirror/lang-html': 6.4.11
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
       '@lezer/markdown': 1.6.4
 
@@ -1085,7 +1085,7 @@ snapshots:
       '@codemirror/autocomplete': 6.20.3
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
       '@lezer/xml': 1.0.6
 
@@ -1128,7 +1128,7 @@ snapshots:
   '@codemirror/language@6.12.4':
     dependencies:
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.10
@@ -1141,13 +1141,13 @@ snapshots:
   '@codemirror/lint@6.9.7':
     dependencies:
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       crelt: 1.0.7
 
   '@codemirror/search@6.7.1':
     dependencies:
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       crelt: 1.0.7
 
   '@codemirror/state@6.7.0':
@@ -1158,10 +1158,10 @@ snapshots:
     dependencies:
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
       '@lezer/highlight': 1.2.3
 
-  '@codemirror/view@6.43.4':
+  '@codemirror/view@6.43.5':
     dependencies:
       '@codemirror/state': 6.7.0
       crelt: 1.0.7
@@ -1196,7 +1196,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@electron/osx-sign@2.4.2':
+  '@electron/osx-sign@2.5.0':
     dependencies:
       debug: 4.4.3
       isbinaryfile: 4.0.10
@@ -1205,15 +1205,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@electron/packager@20.0.1':
+  '@electron/packager@20.0.2':
     dependencies:
       '@electron-internal/extract-zip': 1.0.4
       '@electron/asar': 4.2.0
       '@electron/get': 5.0.0
       '@electron/notarize': 3.1.1
-      '@electron/osx-sign': 2.4.2
-      '@electron/universal': 3.0.5
-      '@electron/windows-sign': 2.0.5
+      '@electron/osx-sign': 2.5.0
+      '@electron/universal': 3.0.6
+      '@electron/windows-sign': 2.0.6
       '@malept/cross-spawn-promise': 2.0.0
       debug: 4.4.3
       filenamify: 6.0.0
@@ -1227,7 +1227,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@electron/universal@3.0.5':
+  '@electron/universal@3.0.6':
     dependencies:
       '@electron/asar': 4.2.0
       debug: 4.4.3
@@ -1235,7 +1235,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@electron/windows-sign@2.0.5':
+  '@electron/windows-sign@2.0.6':
     dependencies:
       debug: 4.4.3
       graceful-fs: 4.2.11
@@ -1478,7 +1478,7 @@ snapshots:
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
       estraverse: 5.3.0
-      picomatch: 4.0.4
+      picomatch: 4.0.5
 
   '@types/esrecurse@4.3.1': {}
 
@@ -1527,7 +1527,7 @@ snapshots:
       '@codemirror/lint': 6.9.7
       '@codemirror/search': 6.7.1
       '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.4
+      '@codemirror/view': 6.43.5
 
   commander@13.1.0: {}
 
@@ -1840,7 +1840,7 @@ snapshots:
 
   pe-library@1.0.1: {}
 
-  picomatch@4.0.4: {}
+  picomatch@4.0.5: {}
 
   plist@3.1.1:
     dependencies:
