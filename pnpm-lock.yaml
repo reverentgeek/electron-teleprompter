@@ -43,8 +43,8 @@ importers:
         specifier: ^10.8.0
         version: 10.8.0
       eslint-config-reverentgeek:
-        specifier: ^7.1.14
-        version: 7.1.14(eslint@10.8.0)
+        specifier: ^7.1.15
+        version: 7.1.15(eslint@10.8.0)
 
 packages:
 
@@ -150,8 +150,8 @@ packages:
     engines: {node: '>=22.12.0'}
     hasBin: true
 
-  '@electron/get@5.0.0':
-    resolution: {integrity: sha512-pjoBpru1KdEtcExBnuHAP1cAc/5faoedw0hzJkL3o4/IJp7HNF1+fbrdxT3gMYRX2oJfvnA/WXeCTVQpYYxyJA==}
+  '@electron/get@5.1.0':
+    resolution: {integrity: sha512-3kSBtG8ObcTVfXanm5vVJ6UnBLEVmVsRk1M+vGqCuMBV+XLCbJYuWQful+yIy0GQDsSlK0kHEriEHn7SPk4EnA==}
     engines: {node: '>=22.12.0'}
 
   '@electron/notarize@3.1.1':
@@ -561,8 +561,8 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  eslint-config-reverentgeek@7.1.14:
-    resolution: {integrity: sha512-pxrsCqnBXhgdA1GCfF/3yfGgvWh3kDEm8P1kln6/1yXppg0YcTyDileLk6wQ4CHrOtDSAYgQvzxUqCXjs76FJg==}
+  eslint-config-reverentgeek@7.1.15:
+    resolution: {integrity: sha512-yhSNuqBX6S+sqwPzrz0FhsinkBznr3BDR1KILJZCIHeSZWDrbe/EVNiVCVAr4sgJ4OlMq8ElagBfHmvhxKRpPQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       eslint: '>=10.0.0'
@@ -691,8 +691,8 @@ packages:
     resolution: {integrity: sha512-7ACyT3wmyp3I61S4fG682L0VA2RGD9otkqGJIwNUMF1SWUombIIk+af1unuDYgMm082aHYwD+mzJvv9Iu8dsgg==}
     engines: {node: '>=18'}
 
-  globals@17.7.0:
-    resolution: {integrity: sha512-Czmyns5dUsq4seFBR/Kdydhmo8y9kC79hiSkPn0YcGtNnYWnrgt0vjrSjx9tspoDGWm2CMarffRuLjM4xUz8xg==}
+  globals@17.8.0:
+    resolution: {integrity: sha512-Zz/LMDZScFmkakeL2cTHzf+PbWKdpU3uclqkZT7TjDG58j5WPt0PpA+n9uPI24fZtlw07q0OtEi84K+umsRzqQ==}
     engines: {node: '>=18'}
 
   globrex@0.1.2:
@@ -1171,7 +1171,7 @@ snapshots:
       glob: 13.0.6
       minimatch: 10.2.5
 
-  '@electron/get@5.0.0':
+  '@electron/get@5.1.0':
     dependencies:
       debug: 4.4.3
       env-paths: 3.0.0
@@ -1204,7 +1204,7 @@ snapshots:
     dependencies:
       '@electron-internal/extract-zip': 1.0.4
       '@electron/asar': 4.2.1
-      '@electron/get': 5.0.0
+      '@electron/get': 5.1.0
       '@electron/notarize': 3.1.1
       '@electron/osx-sign': 2.6.0
       '@electron/universal': 3.0.6
@@ -1543,7 +1543,7 @@ snapshots:
   electron@43.2.0:
     dependencies:
       '@electron-internal/extract-zip': 1.0.4
-      '@electron/get': 5.0.0
+      '@electron/get': 5.1.0
       '@types/node': 24.13.3
     transitivePeerDependencies:
       - supports-color
@@ -1593,13 +1593,13 @@ snapshots:
       eslint: 10.8.0
       semver: 7.8.5
 
-  eslint-config-reverentgeek@7.1.14(eslint@10.8.0):
+  eslint-config-reverentgeek@7.1.15(eslint@10.8.0):
     dependencies:
       '@eslint/js': 10.0.1(eslint@10.8.0)
       '@stylistic/eslint-plugin': 5.10.0(eslint@10.8.0)
       eslint: 10.8.0
       eslint-plugin-n: 18.2.2(eslint@10.8.0)
-      globals: 17.7.0
+      globals: 17.8.0
     transitivePeerDependencies:
       - ts-declaration-location
       - typescript
@@ -1752,7 +1752,7 @@ snapshots:
 
   globals@15.15.0: {}
 
-  globals@17.7.0: {}
+  globals@17.8.0: {}
 
   globrex@0.1.2: {}
 
