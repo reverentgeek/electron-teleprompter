@@ -17,38 +17,9 @@ Electron Teleprompter is a desktop app that displays markdown/HTML as a transluc
 
 ## Architecture
 
-```
-Main Process (src/main.js)
-    ├── IPC: "content", "fontSize", "opacity", "mirrored"
-    ├── IPC (editor): "requestRawMarkdown", "saveFile", "saveFileAs", "editorDirty",
-    │                  "pauseWatcher", "resumeWatcher", "saveAndClose"
-    ├── IPC (to renderer): "rawMarkdown", "saveResult", "toggleEditor",
-    │                       "menuSave", "menuSaveAs", "requestSaveBeforeClose"
-    ├── menus.js — File > Open/Save/Save As, Edit > Toggle Editor
-    └── utils/
-        ├── state.js — persists app state to app-state.json
-        └── content.js — markdown→HTML via showdown, + readRawMarkdown for editor
-            │
-            │  IPC sends HTML + settings to renderer
-            ▼
-Preload (src/client/teleprompter-preload.mjs)
-    - Pure IPC bridge via contextBridge
-    - Exposes: onContent, onFontSize/saveFontSize, onOpacity/saveOpacity, onMirrored/saveMirrored
-    - Editor: requestRawMarkdown/onRawMarkdown, saveFile/saveFileAs/onSaveResult,
-              onToggleEditor, setEditorDirty, pauseWatcher/resumeWatcher,
-              onRequestSaveBeforeClose/saveAndClose, onMenuSave/onMenuSaveAs
-            │
-            ▼
-Renderer (src/client/teleprompter.js [module] + teleprompter.html + teleprompter.css)
-    - Preview mode: keyboard/clicker navigation, font size, opacity, mirror controls
-    - Edit mode: CodeMirror 6 editor with markdown syntax, one-dark theme
-    - Cmd+E toggles between preview and edit modes
-    - All DOM manipulation happens here (not in preload)
+Main process (`src/main.js`) → preload (`src/client/teleprompter-preload.mjs`, a **pure** `contextBridge` IPC bridge with no DOM work) → renderer (`src/client/teleprompter.js`, where **all** DOM manipulation happens). Keep that split: logic added to the preload breaks the ESM/contextBridge ordering below.
 
-Editor Bundle (src/client/editor.js → editor-bundle.js via esbuild)
-    - CodeMirror 6 entry point bundled as IIFE (window.EditorModule)
-    - editor-bundle.js is gitignored and rebuilt on npm start/build
-```
+`src/client/editor-bundle.js` is an esbuild IIFE (`window.EditorModule`) built from `src/client/editor.js`. It is **gitignored and regenerated** on `npm start`/`npm run build` — never edit or commit it.
 
 **Data flow for opening a file:** Menu or recent file click → `openScriptFile()` → `readAndConvertMarkdown()` (reads file, converts via showdown, injects `<a name="N">` anchors before H2s, appends scroll padding) → sends HTML over IPC → renderer updates `#md` innerHTML.
 
