@@ -69,7 +69,7 @@ const createWindow = ( state ) => {
 		center: state.x == null,
 		webPreferences: {
 			nodeIntegration: false,
-			sandbox: false,
+			sandbox: true,
 			preload: path.join( __dirname, "client", "teleprompter-preload.mjs" )
 		},
 		transparent: true,
