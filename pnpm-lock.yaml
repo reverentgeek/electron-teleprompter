@@ -192,8 +192,8 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
       electron:
-        specifier: ^44.4.1
-        version: 44.4.1
+        specifier: ^44.4.2
+        version: 44.4.2
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -706,8 +706,8 @@ packages:
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
 
-  electron@44.4.1:
-    resolution: {integrity: sha512-gXJarQ2Utfn8G6bp/IqLXvckOSCtrxPWjFqQaqm02Gf4zYn1aP+RN9PKimoLH/DMqjKLfBrNC4C4CviPv0cXnQ==}
+  electron@44.4.2:
+    resolution: {integrity: sha512-872t/+8M8TyribWm2cYpRwHY2aDlyDHOn+CHnhN9kHQStVW8pAijIhFolYA/qQyDdri28Xp8Mi3HEj5kFvajCw==}
     engines: {node: '>= 22.12.0'}
     hasBin: true
 
@@ -1040,8 +1040,8 @@ packages:
     resolution: {integrity: sha512-/6NVYu4U819R2pUIk79n67SYgJHWCce0a5xTP979WbNp0FL9MN1I1QK662IDU1b6JzKTvmhgI7T7JYIxBi3kMQ==}
     hasBin: true
 
-  style-mod@4.1.3:
-    resolution: {integrity: sha512-i/n8VsZydrugj3Iuzll8+x/00GH2vnYsk1eomD8QiRrSAeW6ItbCQDtfXCeJHd0iwiNagqjQkvpvREEPtW3IoQ==}
+  style-mod@4.1.4:
+    resolution: {integrity: sha512-XXWIQt633/EpAFx8aZDOTjBzrCaGmhvEQlQo6MVPfa2OzO2cWo+4hV9h+6UkHYlXGfy+ODXKUdP7Pthmcu5ATw==}
 
   sumchecker@3.0.1:
     resolution: {integrity: sha512-MvjXzkz/BOfyVDkG0oFOtBxHX2u3gKbMHIF/dXblZsgD3BWOFLmHovIpZY7BykJdAjcqRCBi1WYBNdEC9yI7vg==}
@@ -1325,7 +1325,7 @@ snapshots:
       '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.10
-      style-mod: 4.1.3
+      style-mod: 4.1.4
 
   '@codemirror/legacy-modes@6.5.4':
     dependencies:
@@ -1358,7 +1358,7 @@ snapshots:
     dependencies:
       '@codemirror/state': 6.7.5
       crelt: 1.0.7
-      style-mod: 4.1.3
+      style-mod: 4.1.4
       w3c-keyname: 2.2.8
 
   '@electron-internal/extract-zip@1.0.5': {}
@@ -1753,7 +1753,7 @@ snapshots:
 
   deep-is@0.1.4: {}
 
-  electron@44.4.1:
+  electron@44.4.2:
     dependencies:
       '@electron-internal/extract-zip': 1.0.5
       '@electron/get': 5.1.0
@@ -2102,7 +2102,7 @@ snapshots:
     dependencies:
       commander: 9.5.0
 
-  style-mod@4.1.3: {}
+  style-mod@4.1.4: {}
 
   sumchecker@3.0.1:
     dependencies:
