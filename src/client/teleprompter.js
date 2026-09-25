@@ -102,6 +102,8 @@ const micCancelBtn = document.getElementById( "mic-modal-cancel" );
 // --- Auto-scroll state ---
 let autoScrollActive = false;
 let autoScrollStarting = false;
+let autoScrollHandle = null;
+let manualScrollSyncTimer = null;
 let pendingDeepgramKey = null;
 let pendingStartAfterKeySave = false;
 let lastManualScrollTs = 0;
@@ -109,6 +111,7 @@ let autoScrollSpeed = SCROLL_SPEED_DEFAULT;
 let audioDeviceId = null;
 let speedHintTimer = null;
 const MANUAL_SCROLL_GRACE_MS = 3000;
+const MANUAL_SCROLL_SYNC_MS = 300;
 const SPEED_HINT_MS = 1500;
 
 // Track manual scrolling in preview mode
@@ -128,6 +131,11 @@ function noteManualScroll() {
 	if ( autoScrollActive ) {
 		lastManualScrollTs = Date.now();
 		cancelScroll();
+		// Once the user stops scrolling, re-anchor the aligner to what's on screen.
+		clearTimeout( manualScrollSyncTimer );
+		manualScrollSyncTimer = setTimeout( () => {
+			autoScrollHandle?.syncToViewport();
+		}, MANUAL_SCROLL_SYNC_MS );
 	}
 }
 window.addEventListener( "wheel", noteManualScroll, { passive: true } );
@@ -492,7 +500,7 @@ async function tryStartFlow() {
 	}
 
 	try {
-		await startAutoScroll( {
+		autoScrollHandle = await startAutoScroll( {
 			deepgramKey: dgKey.key,
 			scriptEl: md,
 			audioDeviceId,
@@ -524,6 +532,8 @@ async function stopAutoScrollSession() {
 	if ( !autoScrollActive && !autoScrollStarting ) return;
 	autoScrollActive = false;
 	autoScrollStarting = false;
+	autoScrollHandle = null;
+	clearTimeout( manualScrollSyncTimer );
 	setIndicator( null );
 	try {
 		await stopAutoScroll();

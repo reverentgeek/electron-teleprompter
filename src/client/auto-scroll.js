@@ -3,6 +3,7 @@
 
 import {
 	buildWordIndex,
+	findWordAtViewport,
 	scrollToWord,
 	cancelScroll,
 	setScrollSpeed,
@@ -43,6 +44,7 @@ export async function startAutoScroll( { deepgramKey, scriptEl, onStatus, onScro
 
 	const wordIndex = buildWordIndex( scriptEl );
 	const aligner = createAligner( wordIndex.words );
+	aligner.setPosition( findWordAtViewport( wordIndex.ranges ) );
 
 	const baseAudio = {
 		echoCancellation: true,
@@ -138,6 +140,11 @@ export async function startAutoScroll( { deepgramKey, scriptEl, onStatus, onScro
 
 	return {
 		getPosition: () => aligner.currentPosition(),
+		// Re-anchor to the visible text after the user scrolls by hand.
+		syncToViewport: () => {
+			aligner.setPosition( findWordAtViewport( wordIndex.ranges ) );
+			aligner.clearRecent();
+		},
 		wordIndex
 	};
 }

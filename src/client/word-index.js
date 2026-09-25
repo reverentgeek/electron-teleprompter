@@ -32,6 +32,26 @@ export function buildWordIndex( rootEl ) {
 	return { words, ranges };
 }
 
+// Index of the first word at or below the reading line (the same anchor
+// scrollToWord targets), so the aligner can start where the reader is looking.
+export function findWordAtViewport( ranges, verticalAnchor = 0.33 ) {
+	if ( !ranges?.length ) return 0;
+	const anchorY = window.innerHeight * verticalAnchor;
+	let lo = 0;
+	let hi = ranges.length - 1;
+	let found = ranges.length - 1;
+	while ( lo <= hi ) {
+		const mid = ( lo + hi ) >> 1;
+		if ( ranges[mid].getBoundingClientRect().top >= anchorY ) {
+			found = mid;
+			hi = mid - 1;
+		} else {
+			lo = mid + 1;
+		}
+	}
+	return found;
+}
+
 // Smooth scroll using a critically-damped spring (Unity-style SmoothDamp).
 // `smoothTime` is roughly the time-to-target in seconds; dividing by
 // speedMultiplier lets the user dial auto-scroll responsiveness up or down.
