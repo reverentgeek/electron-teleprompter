@@ -29,7 +29,7 @@
 		"@codemirror/theme-one-dark": "^6.1.3",
 		"@electron/packager": "^20.3.0",
 		"codemirror": "^6.0.2",
-		"electron": "^44.4.5",
+		"electron": "^44.5.0",
 		"esbuild": "^0.28.2",
 		"eslint": "^10.11.0",
 		"eslint-config-reverentgeek": "^7.1.23"
@@ -38,5 +38,5 @@
 		"chokidar": "^5.0.0",
 		"showdown": "^2.1.0"
 	},
-	"packageManager": "pnpm@12.8.0+sha512.3916e9559cdfbddf7dc921e8999076584425161de773f6cabf7f47467f0d9452bfa89a689ec245753ad3d55abcb3cf706e667ac12062dbc9c625fbd72bca20dc"
+	"packageManager": "pnpm@12.8.2+sha512.a5941679663d952c5f0ecc38ba98af98b4dc01b95780354f6894f2f873973cef2f7e2989d7db3ee5393938ae21f62fe06bcdf685d475ddad829a62095d2b8b11"
 }
