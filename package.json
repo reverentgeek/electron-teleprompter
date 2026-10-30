@@ -32,7 +32,7 @@
 		"electron": "^45.1.0",
 		"esbuild": "^0.28.2",
 		"eslint": "^10.13.0",
-		"eslint-config-reverentgeek": "^7.1.25"
+		"eslint-config-reverentgeek": "^7.1.26"
 	},
 	"dependencies": {
 		"chokidar": "^6.0.0",
