@@ -44,7 +44,8 @@ export function buildMenus( browserWindow, openScriptFile, recentFiles ) {
 					if ( !results.canceled ) {
 						openScriptFile( results.filePaths[0] );
 					}
-				} },
+				}
+			},
 			{
 				label: "Open Recent",
 				submenu: recentSubmenu.length > 0
