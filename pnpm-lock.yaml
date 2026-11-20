@@ -201,8 +201,8 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
       electron:
-        specifier: ^45.3.4
-        version: 45.3.4
+        specifier: ^45.4.1
+        version: 45.4.1
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -734,8 +734,8 @@ packages:
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
 
-  electron@45.3.4:
-    resolution: {integrity: sha512-cqU5u6arfGd9KJvCODjj32ckxkDQbweTL3v8J51tAsKGmDWYKcAqszvie0NDKBIGl6Ze19QTL74yIAUHrqNDig==}
+  electron@45.4.1:
+    resolution: {integrity: sha512-DjsJ/eQhovkjf1vYFFyh5GB8NMx+L5bdYaonvGOlWselg3DQ0fwIF0N/+2hrPsoS4whmmNswh21ym/8dgt1y5Q==}
     engines: {node: '>= 22.12.0'}
     hasBin: true
 
@@ -1789,7 +1789,7 @@ snapshots:
 
   deep-is@0.1.4: {}
 
-  electron@45.3.4:
+  electron@45.4.1:
     dependencies:
       '@electron-internal/extract-zip': 1.0.8
       '@electron/get': 5.1.0
